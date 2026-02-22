@@ -1,8 +1,9 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using SnackSmasherCore.Data;
+using SnackSmasherCore.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. CORS - Permitir llamadas desde el frontend React
+// 2. Services - Inyección de dependencias
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IVideogameService, VideogameService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IGameReservationService, GameReservationService>();
+builder.Services.AddScoped<ITableReservationService, TableReservationService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<ITableService, TableService>();
+builder.Services.AddScoped<IEventService, EventService>();
+
+// 3. CORS - Permitir llamadas desde el frontend React
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
@@ -26,7 +38,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// 3. JWT Authentication
+// 4. JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
@@ -49,10 +61,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 4. Controllers
+// 5. Controllers
 builder.Services.AddControllers();
 
-// 5. Swagger/OpenAPI
+// 6. Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
