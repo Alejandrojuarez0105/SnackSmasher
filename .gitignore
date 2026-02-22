@@ -1,0 +1,108 @@
+# =============================================
+# BACKEND - .NET (SnackSmasherCore/)
+# =============================================
+
+# Build results
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og/
+**/[Ll]ogs/
+
+# Visual Studio cache/options
+**/.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+**/.vscode/
+
+# User-specific files
+*.rsuser
+*.userprefs
+
+# Build directories
+**/[Dd]ebug/
+**/[Dd]ebugPublic/
+**/[Rr]elease/
+**/[Rr]eleases/
+**/x64/
+**/x86/
+**/[Ww][Ii][Nn]32/
+**/[Aa][Rr][Mm]/
+**/[Aa][Rr][Mm]64/
+**/bld/
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+**/artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Files that contain secrets (NO SUBIR)
+**/appsettings.Development.json
+**/appsettings.Local.json
+*.env
+*.env.local
+
+# =============================================
+# FRONTEND - React/Node.js (SnackSmasherPortal/)
+# =============================================
+
+# Dependencies
+**/node_modules/
+**/.pnp
+**/.pnp.js
+
+# Testing
+**/coverage/
+
+# Production
+**/build/
+**/dist/
+**/dist-ssr/
+
+# Vite
+**/.vite/
+
+# Misc
+.DS_Store
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =============================================
+# BASE DE DATOS (Database/)
+# =============================================
+
+# Backups de SQL Server
+*.bak
+*.trn
+*.ldf
+
+# =============================================
+# OTROS - General
+# =============================================
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
