@@ -76,7 +76,7 @@ namespace SnackSmasherCore.Data
             // =============================================
             modelBuilder.Entity<GameReservation>(entity =>
             {
-                entity.ToTable("GameReservations");
+                entity.ToTable("GameReservations", tb => tb.HasTrigger("trg_GameReservations_UpdateAvailability"));
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Status).IsRequired().HasMaxLength(20).HasDefaultValue("Active");
                 entity.Property(e => e.Notes).HasMaxLength(300);
@@ -118,7 +118,7 @@ namespace SnackSmasherCore.Data
             // =============================================
             modelBuilder.Entity<TableReservation>(entity =>
             {
-                entity.ToTable("TableReservations");
+                entity.ToTable("TableReservations", tb => tb.HasTrigger("trg_TableReservations_UpdateAvailability"));
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.GuestCount).HasDefaultValue(1);
                 entity.Property(e => e.IsMatchEvent).HasDefaultValue(false);

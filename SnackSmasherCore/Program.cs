@@ -66,7 +66,41 @@ builder.Services.AddControllers();
 
 // 6. Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "SnackSmasher Bar API",
+        Version = "v1",
+        Description = "API para gestión de videojuegos, reservas y eventos"
+    });
+
+    // Configuración de autenticación JWT en Swagger
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Ingresa el token JWT en el formato: Bearer {tu token}"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -86,5 +120,40 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// =============================================
+// MENSAJES DE INICIO
+// =============================================
+Console.WriteLine("=====================================================");
+Console.WriteLine("=                                                   =");
+Console.WriteLine("=    SNACKSMASHER BAR API - SISTEMA INICIADO        =");
+Console.WriteLine("=                                                   =");
+Console.WriteLine("=====================================================");
+Console.WriteLine();
+Console.WriteLine($"Entorno: {app.Environment.EnvironmentName}");
+Console.WriteLine($"Aplicación: https://localhost:7018");
+Console.WriteLine($"Swagger UI: https://localhost:7018/swagger");
+Console.WriteLine($"Hora de inicio: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+Console.WriteLine();
+Console.WriteLine("Endpoints disponibles:");
+Console.WriteLine("  AUTH:");
+Console.WriteLine("    • POST   /api/Auth/register              - Registrar usuario");
+Console.WriteLine("    • POST   /api/Auth/login                 - Iniciar sesión");
+Console.WriteLine("  VIDEOJUEGOS:");
+Console.WriteLine("    • GET    /api/Videogames                 - Listar videojuegos");
+Console.WriteLine("    • GET    /api/Videogames/top-rated       - Top valorados");
+Console.WriteLine("    • POST   /api/Videogames                 - Crear juego (Admin)");
+Console.WriteLine("  RESERVAS:");
+Console.WriteLine("    • GET    /api/GameReservations/active    - Reservas activas");
+Console.WriteLine("    • POST   /api/GameReservations           - Reservar juego");
+Console.WriteLine("    • GET    /api/TableReservations          - Ver reservas (Admin)");
+Console.WriteLine("    • POST   /api/TableReservations          - Reservar mesa");
+Console.WriteLine("  MENÚ:");
+Console.WriteLine("    • GET    /api/Menu/categories            - Ver menú completo");
+Console.WriteLine("  EVENTOS:");
+Console.WriteLine("    • GET    /api/Events/upcoming            - Próximos eventos");
+Console.WriteLine();
+Console.WriteLine("=====================================================");
+Console.WriteLine();
 
 app.Run();
