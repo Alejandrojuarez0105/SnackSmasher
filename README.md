@@ -29,6 +29,17 @@ Proyecto/
 │   └── SnackSmasherDB_Script.sql
 │
 ├── SnackSmasherCore/
+│   ├── Controllers/
+│   │   ├── AuthController.cs
+│   │   ├── EventsController.cs
+│   │   ├── GameReservationsController.cs
+│   │   ├── MenuController.cs
+│   │   ├── ReviewsController.cs
+│   │   ├── TableReservationsController.cs
+│   │   ├── TablesController.cs
+│   │   ├── UsersController.cs
+│   │   └── VideogamesController.cs
+│   │
 │   ├── Data/
 │   │   └── ApplicationDbContext.cs
 │   │
@@ -57,10 +68,32 @@ Proyecto/
 │   ├── Properties/
 │   │   └── launchSettings.json
 │   │
+│   ├── Services/
+│   │   ├── AuthService.cs
+│   │   ├── EventService.cs
+│   │   ├── GameReservationService.cs
+│   │   ├── IAuthService.cs
+│   │   ├── IEventService.cs
+│   │   ├── IGameReservation.cs
+│   │   ├── IMenuService.cs
+│   │   ├── IReviewService.cs
+│   │   ├── ITableReservationService.cs
+│   │   ├── ITableService.cs
+│   │   ├── IUserService.cs
+│   │   ├── IVideogameService.cs
+│   │   ├── MenuService.cs
+│   │   ├── ReviewService.cs
+│   │   ├── TableReservationService.cs
+│   │   ├── TableService.cs
+│   │   ├── UserService.cs
+│   │   └── VideogameService.cs
+│   │
 │   ├── appsettings.json
 │   ├── Program.cs
 │   ├── SnackSmasherCore.csproj
 │   └── SnackSmasherCore.sln
+│
+├── SnackSmasherPortal/ (en producción)
 │
 ├── .gitignore
 └── README.md
