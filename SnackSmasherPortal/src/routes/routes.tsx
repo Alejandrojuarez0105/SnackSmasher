@@ -8,15 +8,19 @@ import ProfilePage from '../pages/ProfilePage';
 import ReservationsPage from '../pages/ReservationsPage';
 import MenuPage from '../pages/MenuPage';
 import EventsPage from '../pages/EventsPage';
+import LandingPage from '../pages/LandingPage';
+import PublicGamesPage from '../pages/PublicGamesPage';
+import PublicMenuPage from '../pages/PublicMenuPage';
+import PublicEventsPage from '../pages/PublicEventsPage';
 
 // Componente para rutas protegidas
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
 // Componente para rutas de admin
-const AdminRoute = ({ children }: { children: JSX.Element }) => {
+const AdminRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, isAdmin } = useAuth();
   
   if (!isAuthenticated) {
@@ -31,11 +35,25 @@ const AdminRoute = ({ children }: { children: JSX.Element }) => {
 };
 
 export default function AppRoutes() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <Routes>
       {/* Rutas públicas */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/public/games" element={<PublicGamesPage />} />
+      <Route path="/public/menu" element={<PublicMenuPage />} />
+      <Route path="/public/events" element={<PublicEventsPage />} />
+
+      {/* Auth */}
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />} 
+      />
+      <Route
+        path="/register"
+        element={isAuthenticated ? <Navigate to="/dashboard" /> : <RegisterPage />} 
+      />
 
       {/* Rutas protegidas */}
       <Route
@@ -92,9 +110,8 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Redirección por defecto */}
-      <Route path="/" element={<Navigate to="/login" />} />
-      <Route path="*" element={<Navigate to="/dashboard" />} />
+      {/* Redirección para rutas no encontradas */}
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }
