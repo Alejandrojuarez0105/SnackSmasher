@@ -137,14 +137,21 @@ export default function EventsPage() {
                   <Box
                     sx={{
                       height: 180,
-                      background: 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 204, 204, 0.2) 100%)',
+                      background: event.imageUrl
+                      ? `url(${event.imageUrl}) center/cover`
+                      : 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 204, 204, 0.2) 100%)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       borderBottom: '2px solid rgba(0, 255, 255, 0.3)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
                     }}
                   >
+                    {!event.imageUrl && (
                     <Stadium sx={{ fontSize: 100, color: 'primary.main' }} />
+                    )}
                   </Box>
                   <CardContent>
                     <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>

@@ -51,7 +51,7 @@ namespace SnackSmasherCore.Data
             // =============================================
             modelBuilder.Entity<Videogame>(entity =>
             {
-                entity.ToTable("Videogames");
+                entity.ToTable("Videogames", tb => tb.HasTrigger("trg_Videogames_UpdatedAt"));
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(150);
                 entity.Property(e => e.Description).HasMaxLength(500);

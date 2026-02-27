@@ -101,6 +101,16 @@ export default function AdminEventsPage() {
 
   const handleSubmit = async () => {
     try {
+      // Validar URL de imagen si existe
+      if (formData.imageUrl && formData.imageUrl.trim()) {
+        try {
+          new URL(formData.imageUrl); // Verifica que sea una URL válida
+          } catch {
+            setError('La URL de la imagen no es válida');
+            return;
+          }
+        }
+        
       if (editMode && selectedEvent) {
         await axiosInstance.put(`/Events/${selectedEvent.id}`, formData)
         setSuccess('Evento actualizado exitosamente')

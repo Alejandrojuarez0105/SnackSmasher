@@ -221,23 +221,28 @@ export default function VideogamesPage() {
                   }
                 }}
               >
-                <CardMedia
-                  component='div'
-                  sx={{
-                    height: 200,
-                    background:
-                      'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 204, 204, 0.2) 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <SportsEsports sx={{ fontSize: 80, color: 'primary.main' }} />
-                </CardMedia>
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography variant='h6' gutterBottom sx={{ fontWeight: 700 }}>
-                    {game.title}
-                  </Typography>
+                <Box
+                sx={{
+                  height: 200,
+                  background: game.imageUrl
+                  ? `url(${game.imageUrl}) center/cover`
+                  : 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 204, 204, 0.2) 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              >
+                    {!game.imageUrl && (
+                      <SportsEsports sx={{ fontSize: 80, color: 'primary.main' }} />
+                      )}
+                      </Box>
+      
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Typography variant='h6' gutterBottom sx={{ fontWeight: 700 }}>
+                          {game.title}
+                          </Typography>
 
                   <Box sx={{ mb: 2 }}>
                     <Chip label={game.genre} size='small' sx={{ mr: 1, mb: 1 }} />

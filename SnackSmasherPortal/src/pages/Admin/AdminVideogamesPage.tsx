@@ -110,33 +110,42 @@ export default function AdminVideogamesPage() {
 
   const handleSubmit = async () => {
     try {
-      if (editMode && selectedGame) {
-        await axiosInstance.put(`/Videogames/${selectedGame.id}`, formData)
-        setSuccess('Videojuego actualizado exitosamente')
-      } else {
-        await axiosInstance.post('/Videogames', formData)
-        setSuccess('Videojuego creado exitosamente')
+      // Validar URL de imagen si existe
+      if (formData.imageUrl && formData.imageUrl.trim()) {
+        try {
+          new URL(formData.imageUrl); // Verifica que sea una URL válida
+          } catch {
+            setError('La URL de la imagen no es válida');
+            return;
+          }
+        }
+        
+        if (editMode && selectedGame) {
+          await axiosInstance.put(`/Videogames/${selectedGame.id}`, formData)
+          setSuccess('Videojuego actualizado exitosamente')
+        } else {
+          await axiosInstance.post('/Videogames', formData)
+          setSuccess('Videojuego creado exitosamente')
+        }
+        handleCloseDialog()
+        loadVideogames()
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Error al guardar el videojuego')
       }
-      handleCloseDialog()
-      loadVideogames()
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al guardar el videojuego')
     }
-  }
-
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este videojuego?')) return
-
-    try {
-      await axiosInstance.delete(`/Videogames/${id}`)
-      setSuccess('Videojuego eliminado exitosamente')
-      loadVideogames()
-    } catch (err) {
-      setError('Error al eliminar el videojuego')
+    
+    const handleDelete = async (id: number) => {
+      if (!window.confirm('¿Estás seguro de eliminar este videojuego?')) return
+      try {
+        await axiosInstance.delete(`/Videogames/${id}`)
+        setSuccess('Videojuego eliminado exitosamente')
+        loadVideogames()
+      } catch (err) {
+        setError('Error al eliminar el videojuego')
+      }
     }
-  }
-
-  if (loading) {
+    
+    if (loading) {
     return (
       <Layout>
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
