@@ -130,6 +130,22 @@ export default function MenuPage() {
                         },
                       }}
                     >
+                      <Box
+                      sx={{
+                        height: 150,
+                        background: item.imageUrl
+                        ? `url(${item.imageUrl})`
+                        : 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 204, 204, 0.2) 100%)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      >
+                        {!item.imageUrl && <Restaurant sx={{ fontSize: 60, color: 'primary.main' }} />}
+                        </Box>
                       <CardContent>
                         <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
                           {item.name}
