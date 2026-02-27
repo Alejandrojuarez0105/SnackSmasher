@@ -62,7 +62,7 @@ export default function Layout({ children }: LayoutProps) {
     navigate('/login')
   }
 
-  //Menú base
+  // Menú base
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Videojuegos', icon: <GamesIcon />, path: '/videogames' },
@@ -71,7 +71,7 @@ export default function Layout({ children }: LayoutProps) {
     { text: 'Eventos', icon: <EventIcon />, path: '/events' }
   ]
 
-  //Menú admin
+  // Menú admin
   const adminMenuItems = isAdmin
     ? [
         { text: 'Admin: Videojuegos', icon: <GamesIcon />, path: '/admin/videogames' },
@@ -81,6 +81,7 @@ export default function Layout({ children }: LayoutProps) {
       ]
     : []
 
+  // Todos los items
   const allMenuItems = [...menuItems, ...adminMenuItems]
 
   const drawer = (
@@ -215,7 +216,7 @@ export default function Layout({ children }: LayoutProps) {
           </IconButton>
 
           <Typography variant='h6' noWrap component='div' sx={{ flexGrow: 1 }}>
-            {menuItems.find(item => item.path === location.pathname)?.text ||
+            {allMenuItems.find(item => item.path === location.pathname)?.text ||
               'SnackSmasher Bar'}
           </Typography>
 
