@@ -93,7 +93,68 @@ Proyecto/
 │   ├── SnackSmasherCore.csproj
 │   └── SnackSmasherCore.sln
 │
-├── SnackSmasherPortal/ (en producción)
+├── SnackSmasherPortal/
+│   ├── public/
+│   │   └── vite.svg
+│   │
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── auth.ts
+│   │   │   ├── axiosConfig.ts
+│   │   │   ├── events.ts
+│   │   │   ├── gameReservations.ts
+│   │   │   ├── menu.ts
+│   │   │   └── videogames.ts
+│   │   │
+│   │   ├── assets/
+│   │   │   ├── react.svg
+│   │   │
+│   │   ├── components/
+│   │   │   ├── Dashboard/
+│   │   │   │   └── Layout.tsx
+│   │   │   └── Login/
+│   │   │   │   └── AppThemeProvider.tsx
+│   │   │   └── Public/
+│   │   │   │   └── PublicLayout.tsx
+│   │   │
+│   │   ├── context/
+│   │   │   └── AuthContext.tsx
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Admin/
+│   │   │   │   ├── AdminEventsPage.tsx
+│   │   │   │   ├── AdminMenuPage.tsx
+│   │   │   │   ├── AdminTablesPage.tsx
+│   │   │   │   └── AdminVideogamesPage.tsx
+│   │   ├── Dashboard.tsx
+│   │   ├── EventsPage.tsx
+│   │   ├── LandingPage.tsx
+│   │   ├── LoginPage.tsx
+│   │   ├── MenuPage.tsx
+│   │   ├── ProfilePage.tsx
+│   │   ├── PublicEventsPage.tsx
+│   │   ├── PublicGamesPage.tsx
+│   │   ├── PublicMenuPage.tsx
+│   │   ├── RegisterPage.tsx
+│   │   ├── ReservationsPage.tsx
+│   │   └── VideogamesPage.tsx
+│   │   │
+│   │   ├── routes/
+│   │   │   └── routes.tsx
+│   │   │
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   └── main.tsx
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── README.md
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
 │
 ├── .gitignore
 └── README.md
