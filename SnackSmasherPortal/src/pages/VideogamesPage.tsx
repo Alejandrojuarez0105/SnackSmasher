@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Grid,
@@ -18,12 +19,14 @@ import {
   DialogActions,
   Rating
 } from '@mui/material'
-import { SportsEsports, People, Schedule } from '@mui/icons-material'
+import { SportsEsports, People, Schedule, Star } from '@mui/icons-material'
 import Layout from '../components/Dashboard/Layout'
 import { videogamesAPI, VideogameDto } from '../api/videogames'
 import { gameReservationsAPI, CreateGameReservationDto } from '../api/gameReservations'
+import { reviewsAPI, CreateReviewDto } from '../api/reviews'
 
 export default function VideogamesPage() {
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -41,6 +44,14 @@ export default function VideogamesPage() {
     startTime: '',
     endTime: '',
     notes: ''
+  })
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
+  const [selectedGameForReview, setSelectedGameForReview] = useState<VideogameDto | null>(
+    null
+  )
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    comment: ''
   })
 
   useEffect(() => {
@@ -109,6 +120,35 @@ export default function VideogamesPage() {
       loadVideogames()
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al crear la reserva')
+    }
+  }
+
+  const handleOpenReviewDialog = (game: VideogameDto) => {
+    setSelectedGameForReview(game)
+    setReviewForm({ rating: 5, comment: '' })
+    setReviewDialogOpen(true)
+  }
+
+  const handleSubmitReview = async () => {
+    if (!selectedGameForReview) return
+
+    try {
+      const reviewData: CreateReviewDto = {
+        videogameId: selectedGameForReview.id,
+        rating: reviewForm.rating,
+        comment: reviewForm.comment
+      }
+
+      await reviewsAPI.create(reviewData)
+      setSuccess('Reseña agregada exitosamente')
+      setReviewDialogOpen(false)
+      loadVideogames() // Recargar para actualizar las calificaciones
+    } catch (err: any) {
+      if (err.response?.status === 400) {
+        setError('Ya has dejado una reseña para este juego')
+      } else {
+        setError('Error al crear la reseña')
+      }
     }
   }
 
@@ -222,27 +262,27 @@ export default function VideogamesPage() {
                 }}
               >
                 <Box
-                sx={{
-                  height: 200,
-                  background: game.imageUrl
-                  ? `url(${game.imageUrl}) center/cover`
-                  : 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 204, 204, 0.2) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                    {!game.imageUrl && (
-                      <SportsEsports sx={{ fontSize: 80, color: 'primary.main' }} />
-                      )}
-                      </Box>
-      
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Typography variant='h6' gutterBottom sx={{ fontWeight: 700 }}>
-                          {game.title}
-                          </Typography>
+                  sx={{
+                    height: 200,
+                    background: game.imageUrl
+                      ? `url(${game.imageUrl}) center/cover`
+                      : 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 204, 204, 0.2) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
+                >
+                  {!game.imageUrl && (
+                    <SportsEsports sx={{ fontSize: 80, color: 'primary.main' }} />
+                  )}
+                </Box>
+
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant='h6' gutterBottom sx={{ fontWeight: 700 }}>
+                    {game.title}
+                  </Typography>
 
                   <Box sx={{ mb: 2 }}>
                     <Chip label={game.genre} size='small' sx={{ mr: 1, mb: 1 }} />
@@ -283,15 +323,35 @@ export default function VideogamesPage() {
                   <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
                     Copias disponibles: {game.availableCopies}/{game.totalCopies}
                   </Typography>
-
-                  <Button
-                    fullWidth
-                    variant='contained'
-                    disabled={game.availableCopies === 0}
-                    onClick={() => handleReserve(game)}
-                  >
-                    {game.availableCopies === 0 ? 'No Disponible' : 'Reservar'}
-                  </Button>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        fullWidth
+                        variant='contained'
+                        disabled={game.availableCopies === 0}
+                        onClick={() => handleReserve(game)}
+                      >
+                        {game.availableCopies === 0 ? 'No Disponible' : 'Reservar'}
+                      </Button>
+                      <Button
+                        variant='outlined'
+                        onClick={() => handleOpenReviewDialog(game)}
+                        startIcon={<Star />}
+                      >
+                        Reseña
+                      </Button>
+                    </Box>
+                    <Button
+                      fullWidth
+                      variant='text'
+                      size='small'
+                      onClick={() => navigate(`/videogames/${game.id}/reviews`)}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Ver Reseñas {game.totalReviews} reseña
+                      {game.totalReviews !== 1 ? 's' : ''}
+                    </Button>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>
@@ -369,6 +429,45 @@ export default function VideogamesPage() {
               }
             >
               Confirmar Reserva
+            </Button>
+          </DialogActions>
+        </Dialog>
+        {/* Dialog de reseña */}
+        <Dialog
+          open={reviewDialogOpen}
+          onClose={() => setReviewDialogOpen(false)}
+          maxWidth='sm'
+          fullWidth
+        >
+          <DialogTitle>Dejar Reseña: {selectedGameForReview?.title}</DialogTitle>
+          <DialogContent>
+            <Box sx={{ pt: 2 }}>
+              <Typography component='legend' gutterBottom>
+                Calificación
+              </Typography>
+              <Rating
+                value={reviewForm.rating}
+                onChange={(_, newValue) =>
+                  setReviewForm({ ...reviewForm, rating: newValue || 5 })
+                }
+                size='large'
+              />
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                label='Comentario (opcional)'
+                value={reviewForm.comment}
+                onChange={e => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                sx={{ mt: 3 }}
+                placeholder='¿Qué te pareció este juego?'
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setReviewDialogOpen(false)}>Cancelar</Button>
+            <Button variant='contained' onClick={handleSubmitReview}>
+              Publicar Reseña
             </Button>
           </DialogActions>
         </Dialog>

@@ -16,6 +16,7 @@ import AdminVideogamesPage from '../pages/Admin/AdminVideogamesPage'
 import AdminEventsPage from '../pages/Admin/AdminEventsPage'
 import AdminTablesPage from '../pages/Admin/AdminTablesPage'
 import AdminMenuPage from '../pages/Admin/AdminMenuPage'
+import GameReviewsPage from '../pages/GameReviewsPage'
 
 // Componente para rutas protegidas
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
@@ -74,6 +75,15 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <VideogamesPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path='/videogames/:id/reviews'
+        element={
+          <ProtectedRoute>
+            <GameReviewsPage />
           </ProtectedRoute>
         }
       />
