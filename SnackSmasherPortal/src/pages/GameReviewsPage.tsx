@@ -90,7 +90,11 @@ export default function GameReviewsPage() {
     }
   }
 
-  const canEditOrDelete = (review: ReviewDto) => {
+  const canEdit = (review: ReviewDto) => {
+    return review.userId === user?.id
+  }
+
+  const canDelete = (review: ReviewDto) => {
     return isAdmin || review.userId === user?.id
   }
 
@@ -194,9 +198,9 @@ export default function GameReviewsPage() {
                         </Typography>
                       </Box>
                     </Box>
-                    {canEditOrDelete(review) && (
+                    {(canEdit(review) || canDelete(review)) && (
                       <Box>
-                        {review.userId === user?.id && (
+                        {canEdit(review) && (
                           <IconButton
                             size='small'
                             color='primary'
@@ -205,13 +209,15 @@ export default function GameReviewsPage() {
                             <Edit />
                           </IconButton>
                         )}
-                        <IconButton
-                          size='small'
-                          color='error'
-                          onClick={() => handleDelete(review.id)}
-                        >
-                          <Delete />
-                        </IconButton>
+                        {canDelete(review) && (
+                          <IconButton
+                            size='small'
+                            color='error'
+                            onClick={() => handleDelete(review.id)}
+                          >
+                            <Delete />
+                          </IconButton>
+                        )}
                       </Box>
                     )}
                   </Box>

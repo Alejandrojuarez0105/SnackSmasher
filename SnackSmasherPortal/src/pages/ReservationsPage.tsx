@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 import {
   Box,
   Grid,
@@ -10,117 +10,132 @@ import {
   CircularProgress,
   Alert,
   Tabs,
-  Tab,
-} from '@mui/material';
+  Tab
+} from '@mui/material'
 import {
   EventSeat,
   SportsEsports,
   Cancel,
   CheckCircle,
-} from '@mui/icons-material';
-import Layout from '../components/Dashboard/Layout';
-import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations';
-import { useAuth } from '../context/AuthContext';
+  AdminPanelSettings
+} from '@mui/icons-material'
+import Layout from '../components/Dashboard/Layout'
+import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations'
+import { useAuth } from '../context/AuthContext'
 
 export default function ReservationsPage() {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [tabValue, setTabValue] = useState(0);
-  const [gameReservations, setGameReservations] = useState<GameReservationDto[]>([]);
+  const { user, isAdmin } = useAuth()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [tabValue, setTabValue] = useState(0)
+  const [gameReservations, setGameReservations] = useState<GameReservationDto[]>([])
+  const [allReservations, setAllReservations] = useState<GameReservationDto[]>([])
 
   useEffect(() => {
-    loadReservations();
-  }, []);
+    loadReservations()
+  }, [])
 
   const loadReservations = async () => {
-    if (!user?.id) return;
-    
+    if (!user?.id) return
+
     try {
-      setLoading(true);
-      const data = await gameReservationsAPI.getByUser(user.id);
-      setGameReservations(data);
+      setLoading(true)
+
+      if (isAdmin) {
+        const allData = await gameReservationsAPI.getAll()
+        setAllReservations(allData)
+      }
+
+      const data = await gameReservationsAPI.getByUser(user.id)
+      setGameReservations(data)
     } catch (err: any) {
-      setError('Error al cargar las reservas');
-      console.error(err);
+      setError('Error al cargar las reservas')
+      console.error(err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleCancelReservation = async (id: number) => {
     try {
-      await gameReservationsAPI.cancel(id);
-      setSuccess('Reserva cancelada exitosamente');
-      loadReservations();
+      await gameReservationsAPI.cancel(id)
+      setSuccess('Reserva cancelada exitosamente')
+      loadReservations()
     } catch (err: any) {
-      setError('Error al cancelar la reserva');
+      setError('Error al cancelar la reserva')
     }
-  };
+  }
 
-  const activeReservations = gameReservations.filter(r => r.status === 'Active');
-  const pastReservations = gameReservations.filter(r => r.status !== 'Active');
+  const activeReservations = gameReservations.filter(r => r.status === 'Active')
+  const pastReservations = gameReservations.filter(r => r.status !== 'Active')
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Active':
-        return 'success';
+        return 'success'
       case 'Completed':
-        return 'info';
+        return 'info'
       case 'Cancelled':
-        return 'error';
+        return 'error'
       default:
-        return 'default';
+        return 'default'
     }
-  };
+  }
 
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'Active':
-        return 'Activa';
+        return 'Activa'
       case 'Completed':
-        return 'Completada';
+        return 'Completada'
       case 'Cancelled':
-        return 'Cancelada';
+        return 'Cancelada'
       default:
-        return status;
+        return status
     }
-  };
+  }
 
   if (loading) {
     return (
       <Layout>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '60vh'
+          }}
+        >
           <CircularProgress />
         </Box>
       </Layout>
-    );
+    )
   }
 
   return (
     <Layout>
       <Box>
         <Typography
-          variant="h4"
+          variant='h4'
           gutterBottom
-          className="neon-text"
+          className='neon-text'
           sx={{ fontWeight: 700, mb: 1 }}
         >
           Mis Reservas 📅
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        <Typography variant='body1' color='text.secondary' sx={{ mb: 4 }}>
           Gestiona tus reservas de juegos y mesas
         </Typography>
 
         {error && (
-          <Alert severity="error" onClose={() => setError('')} sx={{ mb: 3 }}>
+          <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
             {error}
           </Alert>
         )}
 
         {success && (
-          <Alert severity="success" onClose={() => setSuccess('')} sx={{ mb: 3 }}>
+          <Alert severity='success' onClose={() => setSuccess('')} sx={{ mb: 3 }}>
             {success}
           </Alert>
         )}
@@ -133,21 +148,28 @@ export default function ReservationsPage() {
               '& .MuiTab-root': {
                 fontWeight: 600,
                 '&.Mui-selected': {
-                  color: 'primary.main',
-                },
-              },
+                  color: 'primary.main'
+                }
+              }
             }}
           >
-            <Tab 
-              icon={<SportsEsports />} 
-              label={`Reservas Activas (${activeReservations.length})`}
-              iconPosition="start"
+            <Tab
+              icon={<SportsEsports />}
+              label={`Mis Reservas Activas (${activeReservations.length})`}
+              iconPosition='start'
             />
-            <Tab 
-              icon={<EventSeat />} 
-              label={`Historial (${pastReservations.length})`}
-              iconPosition="start"
+            <Tab
+              icon={<EventSeat />}
+              label={`Mi Historial (${pastReservations.length})`}
+              iconPosition='start'
             />
+            {isAdmin && (
+              <Tab
+                icon={<AdminPanelSettings />}
+                label={`Todas las Reservas (${allReservations.length})`}
+                iconPosition='start'
+              />
+            )}
           </Tabs>
         </Box>
 
@@ -159,22 +181,24 @@ export default function ReservationsPage() {
                 <Card
                   sx={{
                     border: '2px solid rgba(0, 255, 255, 0.3)',
-                    background: 'rgba(0, 255, 255, 0.05)',
+                    background: 'rgba(0, 255, 255, 0.05)'
                   }}
                 >
                   <CardContent sx={{ textAlign: 'center', py: 6 }}>
-                    <SportsEsports sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-                    <Typography variant="h6" color="text.secondary">
+                    <SportsEsports
+                      sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }}
+                    />
+                    <Typography variant='h6' color='text.secondary'>
                       No tienes reservas activas
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant='body2' color='text.secondary'>
                       Ve a la sección de Videojuegos para crear una reserva
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
             ) : (
-              activeReservations.map((reservation) => (
+              activeReservations.map(reservation => (
                 <Grid item xs={12} md={6} key={reservation.id}>
                   <Card
                     sx={{
@@ -183,35 +207,54 @@ export default function ReservationsPage() {
                       transition: 'all 0.3s ease',
                       '&:hover': {
                         transform: 'translateY(-4px)',
-                        boxShadow: '0 8px 30px rgba(0, 255, 255, 0.3)',
-                      },
+                        boxShadow: '0 8px 30px rgba(0, 255, 255, 0.3)'
+                      }
                     }}
                   >
                     <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'start',
+                          mb: 2
+                        }}
+                      >
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <SportsEsports sx={{ mr: 1, color: 'primary.main' }} />
-                          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                          <Typography variant='h6' sx={{ fontWeight: 700 }}>
                             {reservation.videogameTitle}
                           </Typography>
                         </Box>
                         <Chip
                           label={getStatusLabel(reservation.status)}
                           color={getStatusColor(reservation.status) as any}
-                          size="small"
+                          size='small'
                           icon={<CheckCircle />}
                         />
                       </Box>
 
                       <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                        <Typography
+                          variant='body2'
+                          color='text.secondary'
+                          sx={{ mb: 0.5 }}
+                        >
                           📅 Fecha: {reservation.reservationDate}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                        <Typography
+                          variant='body2'
+                          color='text.secondary'
+                          sx={{ mb: 0.5 }}
+                        >
                           ⏰ Horario: {reservation.startTime} - {reservation.endTime}
                         </Typography>
                         {reservation.notes && (
-                          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                          <Typography
+                            variant='body2'
+                            color='text.secondary'
+                            sx={{ mt: 1 }}
+                          >
                             📝 {reservation.notes}
                           </Typography>
                         )}
@@ -219,8 +262,8 @@ export default function ReservationsPage() {
 
                       <Button
                         fullWidth
-                        variant="outlined"
-                        color="error"
+                        variant='outlined'
+                        color='error'
                         startIcon={<Cancel />}
                         onClick={() => handleCancelReservation(reservation.id)}
                       >
@@ -242,45 +285,52 @@ export default function ReservationsPage() {
                 <Card
                   sx={{
                     border: '2px solid rgba(0, 255, 255, 0.3)',
-                    background: 'rgba(0, 255, 255, 0.05)',
+                    background: 'rgba(0, 255, 255, 0.05)'
                   }}
                 >
                   <CardContent sx={{ textAlign: 'center', py: 6 }}>
                     <EventSeat sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-                    <Typography variant="h6" color="text.secondary">
+                    <Typography variant='h6' color='text.secondary'>
                       No tienes reservas pasadas
                     </Typography>
                   </CardContent>
                 </Card>
               </Grid>
             ) : (
-              pastReservations.map((reservation) => (
+              pastReservations.map(reservation => (
                 <Grid item xs={12} md={6} key={reservation.id}>
                   <Card
                     sx={{
                       border: '1px solid rgba(0, 255, 255, 0.2)',
-                      opacity: 0.8,
+                      opacity: 0.8
                     }}
                   >
                     <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'start',
+                          mb: 2
+                        }}
+                      >
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <SportsEsports sx={{ mr: 1, color: 'text.secondary' }} />
-                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          <Typography variant='h6' sx={{ fontWeight: 600 }}>
                             {reservation.videogameTitle}
                           </Typography>
                         </Box>
                         <Chip
                           label={getStatusLabel(reservation.status)}
                           color={getStatusColor(reservation.status) as any}
-                          size="small"
+                          size='small'
                         />
                       </Box>
 
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                      <Typography variant='body2' color='text.secondary' sx={{ mb: 0.5 }}>
                         📅 {reservation.reservationDate}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant='body2' color='text.secondary'>
                         ⏰ {reservation.startTime} - {reservation.endTime}
                       </Typography>
                     </CardContent>
@@ -290,7 +340,70 @@ export default function ReservationsPage() {
             )}
           </Grid>
         )}
+        {/* Todas las Reservas (Solo Admin) */}
+        {isAdmin && tabValue === 2 && (
+          <Grid container spacing={3}>
+            {allReservations.length === 0 ? (
+              <Grid item xs={12}>
+                <Card>
+                  <CardContent sx={{ textAlign: 'center', py: 6 }}>
+                    <EventSeat sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+                    <Typography variant='h6' color='text.secondary'>
+                      No hay reservas en el sistema
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ) : (
+              allReservations.map(reservation => (
+                <Grid item xs={12} md={6} key={reservation.id}>
+                  <Card>
+                    <CardContent>
+                      <Box
+                        sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}
+                      >
+                        <Typography variant='h6' sx={{ fontWeight: 700 }}>
+                          {reservation.videogameTitle}
+                        </Typography>
+                        <Chip
+                          label={getStatusLabel(reservation.status)}
+                          color={getStatusColor(reservation.status) as any}
+                          size='small'
+                        />
+                      </Box>
+
+                      <Typography variant='body2' sx={{ mb: 1 }}>
+                        👤 Usuario: <strong>{reservation.username}</strong>
+                      </Typography>
+
+                      <Typography variant='body2'>
+                        📅 {reservation.reservationDate}
+                      </Typography>
+
+                      <Typography variant='body2'>
+                        ⏰ {reservation.startTime} - {reservation.endTime}
+                      </Typography>
+
+                      {reservation.status === 'Active' && (
+                        <Button
+                          fullWidth
+                          variant='outlined'
+                          color='error'
+                          startIcon={<Cancel />}
+                          sx={{ mt: 2 }}
+                          onClick={() => handleCancelReservation(reservation.id)}
+                        >
+                          Cancelar Reserva
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))
+            )}
+          </Grid>
+        )}
       </Box>
     </Layout>
-  );
+  )
 }
