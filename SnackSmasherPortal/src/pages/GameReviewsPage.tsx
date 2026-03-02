@@ -23,6 +23,7 @@ import Layout from '../components/Dashboard/Layout'
 import { reviewsAPI, ReviewDto } from '../api/reviews'
 import { videogamesAPI, VideogameDto } from '../api/videogames'
 import { useAuth } from '../context/AuthContext'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function GameReviewsPage() {
   const { id } = useParams<{ id: string }>()
@@ -101,9 +102,7 @@ export default function GameReviewsPage() {
   if (loading) {
     return (
       <Layout>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
-        </Box>
+        <LoadingSpinner message='Cargando reseñas...' />
       </Layout>
     )
   }

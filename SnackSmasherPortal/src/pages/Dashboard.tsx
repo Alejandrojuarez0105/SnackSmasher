@@ -19,6 +19,7 @@ import Layout from '../components/Dashboard/Layout';
 import { videogamesAPI, VideogameDto } from '../api/videogames';
 import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations';
 import { useAuth } from '../context/AuthContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -102,9 +103,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <Layout>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-          <CircularProgress />
-        </Box>
+        <LoadingSpinner message='Cargando dashboard...' />
       </Layout>
     );
   }

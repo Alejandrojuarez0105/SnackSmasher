@@ -21,6 +21,7 @@ import {
 } from '@mui/icons-material';
 import PublicLayout from '../components/Public/PublicLayout';
 import { eventsAPI, EventDto } from '../api/events';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function PublicEventsPage() {
   const navigate = useNavigate();
@@ -56,9 +57,7 @@ export default function PublicEventsPage() {
     return (
       <PublicLayout>
         <Container>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-            <CircularProgress />
-          </Box>
+          <LoadingSpinner message='Cargando eventos...' />
         </Container>
       </PublicLayout>
     );

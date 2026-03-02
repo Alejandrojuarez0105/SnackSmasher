@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import PublicLayout from '../components/Public/PublicLayout';
 import { videogamesAPI, VideogameDto } from '../api/videogames';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function PublicGamesPage() {
   const navigate = useNavigate();
@@ -86,9 +87,7 @@ export default function PublicGamesPage() {
     return (
       <PublicLayout>
         <Container>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-            <CircularProgress />
-          </Box>
+          <LoadingSpinner message='Cargando videojuegos...' />
         </Container>
       </PublicLayout>
     );
@@ -117,16 +116,24 @@ export default function PublicGamesPage() {
           )}
 
           {/* Filtros */}
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
+          <Grid container spacing={2} sx={{ mb: 4 }}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Buscar juego"
                 value={filters.search}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                placeholder="Buscar por título..."
+                InputProps={{
+                  startAdornment: (
+                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
+                    <SportsEsports sx={{ color: 'primary.main' }} />
+                  </Box>
+                  )
+                }}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={6} md={3}>
               <TextField
                 fullWidth
                 select
@@ -134,13 +141,15 @@ export default function PublicGamesPage() {
                 value={filters.genre}
                 onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
               >
-                <MenuItem value="">Todos</MenuItem>
+                <MenuItem value="">
+                <em>Todos los géneros</em>
+                </MenuItem>
                 {genres.map(genre => (
                   <MenuItem key={genre} value={genre}>{genre}</MenuItem>
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid item xs={12} sm={6} md={3}>
               <TextField
                 fullWidth
                 select
@@ -148,13 +157,30 @@ export default function PublicGamesPage() {
                 value={filters.platform}
                 onChange={(e) => setFilters({ ...filters, platform: e.target.value })}
               >
-                <MenuItem value="">Todas</MenuItem>
+                <MenuItem value="">
+                <em>Todas las plataformas</em>
+                </MenuItem>
                 {platforms.map(platform => (
                   <MenuItem key={platform} value={platform}>{platform}</MenuItem>
                 ))}
               </TextField>
             </Grid>
           </Grid>
+          {/* Resultados y botón de limpiar filtros */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="body1" color="text.secondary">
+            Mostrando {filteredGames.length} de {videogames.length} juegos
+          </Typography>
+          {(filters.search || filters.genre || filters.platform) && (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setFilters({ search: '', genre: '', platform: '' })}
+            >
+              Limpiar filtros
+            </Button>
+          )}
+        </Box>
         </Box>
 
         {/* Grid de videojuegos */}

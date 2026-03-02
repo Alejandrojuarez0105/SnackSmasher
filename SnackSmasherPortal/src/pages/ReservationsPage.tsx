@@ -22,6 +22,7 @@ import {
 import Layout from '../components/Dashboard/Layout'
 import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations'
 import { useAuth } from '../context/AuthContext'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function ReservationsPage() {
   const { user, isAdmin } = useAuth()
@@ -99,16 +100,7 @@ export default function ReservationsPage() {
   if (loading) {
     return (
       <Layout>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '60vh'
-          }}
-        >
-          <CircularProgress />
-        </Box>
+        <LoadingSpinner message='Cargando reservas...' />
       </Layout>
     )
   }

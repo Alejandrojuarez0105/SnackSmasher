@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material';
 import Layout from '../components/Dashboard/Layout';
 import { menuAPI, MenuCategoryDto } from '../api/menu';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function MenuPage() {
   const [loading, setLoading] = useState(true);
@@ -45,9 +46,7 @@ export default function MenuPage() {
   if (loading) {
     return (
       <Layout>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-          <CircularProgress />
-        </Box>
+        <LoadingSpinner message='Cargando menú...' />
       </Layout>
     );
   }

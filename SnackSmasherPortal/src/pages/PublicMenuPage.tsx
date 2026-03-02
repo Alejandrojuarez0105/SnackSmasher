@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import PublicLayout from '../components/Public/PublicLayout';
 import { menuAPI, MenuCategoryDto } from '../api/menu';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function PublicMenuPage() {
   const navigate = useNavigate();
@@ -51,9 +52,7 @@ export default function PublicMenuPage() {
     return (
       <PublicLayout>
         <Container>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-            <CircularProgress />
-          </Box>
+          <LoadingSpinner message='Cargando menú...' />
         </Container>
       </PublicLayout>
     );

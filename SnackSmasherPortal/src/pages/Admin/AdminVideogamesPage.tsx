@@ -21,6 +21,7 @@ import {
 import { Add, Edit, Delete, SportsEsports } from '@mui/icons-material'
 import Layout from '../../components/Dashboard/Layout'
 import axiosInstance from '../../api/axiosConfig'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 interface Videogame {
   id: number
@@ -148,9 +149,7 @@ export default function AdminVideogamesPage() {
     if (loading) {
     return (
       <Layout>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
-        </Box>
+        <LoadingSpinner message='Cargando videojuegos...' />
       </Layout>
     )
   }

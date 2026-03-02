@@ -21,6 +21,7 @@ import {
 import { Add, Edit, Delete, TableRestaurant } from '@mui/icons-material'
 import Layout from '../../components/Dashboard/Layout'
 import axiosInstance from '../../api/axiosConfig'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 interface Table {
   id: number
@@ -130,9 +131,7 @@ export default function AdminTablesPage() {
   if (loading) {
     return (
       <Layout>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
-        </Box>
+        <LoadingSpinner message='Cargando mesas...' />
       </Layout>
     )
   }

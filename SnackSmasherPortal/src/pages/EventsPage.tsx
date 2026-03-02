@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import Layout from '../components/Dashboard/Layout';
 import { eventsAPI, EventDto } from '../api/events';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function EventsPage() {
   const [loading, setLoading] = useState(true);
@@ -50,9 +51,7 @@ export default function EventsPage() {
   if (loading) {
     return (
       <Layout>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-          <CircularProgress />
-        </Box>
+        <LoadingSpinner message='Cargando eventos...' />
       </Layout>
     );
   }
