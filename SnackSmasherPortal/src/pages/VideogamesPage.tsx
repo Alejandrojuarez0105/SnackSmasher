@@ -25,12 +25,12 @@ import { videogamesAPI, VideogameDto } from '../api/videogames'
 import { gameReservationsAPI, CreateGameReservationDto } from '../api/gameReservations'
 import { reviewsAPI, CreateReviewDto } from '../api/reviews'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { useNotification } from '../utils/useNotification'
 
 export default function VideogamesPage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const { showSuccess, showError } = useNotification()
   const [videogames, setVideogames] = useState<VideogameDto[]>([])
   const [filteredGames, setFilteredGames] = useState<VideogameDto[]>([])
   const [selectedGame, setSelectedGame] = useState<VideogameDto | null>(null)
@@ -70,7 +70,7 @@ export default function VideogamesPage() {
       setVideogames(data)
       setFilteredGames(data)
     } catch (err: any) {
-      setError('Error al cargar los videojuegos')
+      showError('Error al cargar los videojuegos')
       console.error(err)
     } finally {
       setLoading(false)
@@ -115,12 +115,12 @@ export default function VideogamesPage() {
       }
 
       await gameReservationsAPI.create(reservationData)
-      setSuccess('Reserva creada exitosamente')
+      showSuccess('Reserva creada exitosamente')
       setReservationDialogOpen(false)
       setReservationForm({ reservationDate: '', startTime: '', endTime: '', notes: '' })
       loadVideogames()
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al crear la reserva')
+      showError(err.response?.data?.message || 'Error al crear la reserva')
     }
   }
 
@@ -141,14 +141,14 @@ export default function VideogamesPage() {
       }
 
       await reviewsAPI.create(reviewData)
-      setSuccess('Reseña agregada exitosamente')
+      showSuccess('Reseña agregada exitosamente')
       setReviewDialogOpen(false)
       loadVideogames() // Recargar para actualizar las calificaciones
     } catch (err: any) {
       if (err.response?.status === 400) {
-        setError('Ya has dejado una reseña para este juego')
+        showError('Ya has dejado una reseña para este juego')
       } else {
-        setError('Error al crear la reseña')
+        showError('Error al crear la reseña')
       }
     }
   }
@@ -179,29 +179,17 @@ export default function VideogamesPage() {
           Explora nuestra colección y reserva tu juego favorito
         </Typography>
 
-        {error && (
-          <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity='success' onClose={() => setSuccess('')} sx={{ mb: 3 }}>
-            {success}
-          </Alert>
-        )}
-
         {/* Filtros */}
         <Grid container spacing={2} sx={{ mb: 4 }}>
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              label="Buscar juego"
+              label='Buscar juego'
               value={filters.search}
               onChange={e => setFilters({ ...filters, search: e.target.value })}
-              placeholder="Buscar por título..."
+              placeholder='Buscar por título...'
               InputProps={{
-                startAdornment : (
+                startAdornment: (
                   <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
                     <SportsEsports sx={{ color: 'primary.main' }} />
                   </Box>
@@ -218,10 +206,12 @@ export default function VideogamesPage() {
               onChange={e => setFilters({ ...filters, genre: e.target.value })}
             >
               <MenuItem value=''>
-              <em>Todos los géneros</em>
+                <em>Todos los géneros</em>
               </MenuItem>
               {genres.map(genre => (
-                <MenuItem key={genre} value={genre}>{genre}</MenuItem>
+                <MenuItem key={genre} value={genre}>
+                  {genre}
+                </MenuItem>
               ))}
             </TextField>
           </Grid>
@@ -234,24 +224,33 @@ export default function VideogamesPage() {
               onChange={e => setFilters({ ...filters, platform: e.target.value })}
             >
               <MenuItem value=''>
-              <em>Todas las plataformas</em>
+                <em>Todas las plataformas</em>
               </MenuItem>
               {platforms.map(platform => (
-                <MenuItem key={platform} value={platform}>{platform}</MenuItem>
+                <MenuItem key={platform} value={platform}>
+                  {platform}
+                </MenuItem>
               ))}
             </TextField>
           </Grid>
         </Grid>
 
         {/* Resultados y botón de limpiar filtros */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="body1" color="text.secondary">
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 3
+          }}
+        >
+          <Typography variant='body1' color='text.secondary'>
             Mostrando {filteredGames.length} de {videogames.length} juegos
           </Typography>
           {(filters.search || filters.genre || filters.platform) && (
             <Button
-              variant="outlined"
-              size="small"
+              variant='outlined'
+              size='small'
               onClick={() => setFilters({ search: '', genre: '', platform: '' })}
             >
               Limpiar filtros

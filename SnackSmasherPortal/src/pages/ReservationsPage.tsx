@@ -23,12 +23,12 @@ import Layout from '../components/Dashboard/Layout'
 import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations'
 import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { useNotification } from '../utils/useNotification'
 
 export default function ReservationsPage() {
   const { user, isAdmin } = useAuth()
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const { showSuccess, showError } = useNotification()
   const [tabValue, setTabValue] = useState(0)
   const [gameReservations, setGameReservations] = useState<GameReservationDto[]>([])
   const [allReservations, setAllReservations] = useState<GameReservationDto[]>([])
@@ -51,7 +51,7 @@ export default function ReservationsPage() {
       const data = await gameReservationsAPI.getByUser(user.id)
       setGameReservations(data)
     } catch (err: any) {
-      setError('Error al cargar las reservas')
+      showError('Error al cargar las reservas')
       console.error(err)
     } finally {
       setLoading(false)
@@ -61,10 +61,10 @@ export default function ReservationsPage() {
   const handleCancelReservation = async (id: number) => {
     try {
       await gameReservationsAPI.cancel(id)
-      setSuccess('Reserva cancelada exitosamente')
+      showSuccess('Reserva cancelada exitosamente')
       loadReservations()
     } catch (err: any) {
-      setError('Error al cancelar la reserva')
+      showError('Error al cancelar la reserva')
     }
   }
 
@@ -119,18 +119,6 @@ export default function ReservationsPage() {
         <Typography variant='body1' color='text.secondary' sx={{ mb: 4 }}>
           Gestiona tus reservas de juegos y mesas
         </Typography>
-
-        {error && (
-          <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity='success' onClose={() => setSuccess('')} sx={{ mb: 3 }}>
-            {success}
-          </Alert>
-        )}
 
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
           <Tabs
