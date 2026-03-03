@@ -31,18 +31,19 @@ import { useAuth } from '../context/AuthContext'
 import { reviewsAPI, ReviewDto } from '../api/reviews'
 import { useNavigate } from 'react-router-dom'
 import { Star, Delete } from '@mui/icons-material'
+import { useNotification } from '../utils/useNotification'
 
 export default function ProfilePage() {
   const { user, isAdmin } = useAuth()
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const [success, setSuccess] = useState('')
+  const { showSuccess } = useNotification()
 
   const handleEditProfile = () => {
     setEditDialogOpen(true)
   }
 
   const handleSaveProfile = () => {
-    setSuccess('Perfil actualizado exitosamente')
+    showSuccess('Perfil actualizado exitosamente')
     setEditDialogOpen(false)
   }
 
@@ -76,7 +77,7 @@ export default function ProfilePage() {
 
     try {
       await reviewsAPI.delete(reviewId)
-      setSuccess('Reseña eliminada exitosamente')
+      showSuccess('Reseña eliminada exitosamente')
       loadMyReviews()
     } catch (err) {
       console.error('Error al eliminar reseña:', err)
@@ -97,12 +98,6 @@ export default function ProfilePage() {
         <Typography variant='body1' color='text.secondary' sx={{ mb: 4 }}>
           Información de tu cuenta
         </Typography>
-
-        {success && (
-          <Alert severity='success' onClose={() => setSuccess('')} sx={{ mb: 3 }}>
-            {success}
-          </Alert>
-        )}
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>

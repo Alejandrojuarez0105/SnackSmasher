@@ -29,6 +29,7 @@ export default function ReservationsPage() {
   const { user, isAdmin } = useAuth()
   const [loading, setLoading] = useState(true)
   const { showSuccess, showError } = useNotification()
+  const [error, setError] = useState('')
   const [tabValue, setTabValue] = useState(0)
   const [gameReservations, setGameReservations] = useState<GameReservationDto[]>([])
   const [allReservations, setAllReservations] = useState<GameReservationDto[]>([])
@@ -51,7 +52,7 @@ export default function ReservationsPage() {
       const data = await gameReservationsAPI.getByUser(user.id)
       setGameReservations(data)
     } catch (err: any) {
-      showError('Error al cargar las reservas')
+      setError('Error al cargar las reservas')
       console.error(err)
     } finally {
       setLoading(false)
@@ -256,6 +257,12 @@ export default function ReservationsPage() {
             )}
           </Grid>
         )}
+
+        {error && (
+          <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
+            {error}
+            </Alert>
+          )}
 
         {/* Historial */}
         {tabValue === 1 && (

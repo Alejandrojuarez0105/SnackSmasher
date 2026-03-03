@@ -24,6 +24,7 @@ import { reviewsAPI, ReviewDto } from '../api/reviews'
 import { videogamesAPI, VideogameDto } from '../api/videogames'
 import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { useNotification } from '../utils/useNotification'
 
 export default function GameReviewsPage() {
   const { id } = useParams<{ id: string }>()
@@ -32,8 +33,7 @@ export default function GameReviewsPage() {
   const [loading, setLoading] = useState(true)
   const [game, setGame] = useState<VideogameDto | null>(null)
   const [reviews, setReviews] = useState<ReviewDto[]>([])
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const { showSuccess, showError } = useNotification()
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [selectedReview, setSelectedReview] = useState<ReviewDto | null>(null)
   const [editForm, setEditForm] = useState({ rating: 5, comment: '' })
@@ -54,7 +54,7 @@ export default function GameReviewsPage() {
       setGame(gameData)
       setReviews(reviewsData)
     } catch (err) {
-      setError('Error al cargar las reseñas')
+      showError('Error al cargar las reseñas')
     } finally {
       setLoading(false)
     }
@@ -65,10 +65,10 @@ export default function GameReviewsPage() {
 
     try {
       await reviewsAPI.delete(reviewId)
-      setSuccess('Reseña eliminada exitosamente')
+      showSuccess('Reseña eliminada exitosamente')
       loadData()
     } catch (err) {
-      setError('Error al eliminar la reseña')
+      showError('Error al eliminar la reseña')
     }
   }
 
@@ -83,11 +83,11 @@ export default function GameReviewsPage() {
 
     try {
       await reviewsAPI.update(selectedReview.id, editForm)
-      setSuccess('Reseña actualizada exitosamente')
+      showSuccess('Reseña actualizada exitosamente')
       setEditDialogOpen(false)
       loadData()
     } catch (err) {
-      setError('Error al actualizar la reseña')
+      showError('Error al actualizar la reseña')
     }
   }
 
@@ -140,18 +140,6 @@ export default function GameReviewsPage() {
             </Typography>
           </Box>
         </Box>
-
-        {error && (
-          <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity='success' onClose={() => setSuccess('')} sx={{ mb: 3 }}>
-            {success}
-          </Alert>
-        )}
 
         {reviews.length === 0 ? (
           <Card

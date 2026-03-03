@@ -22,6 +22,7 @@ import { Add, Edit, Delete, TableRestaurant } from '@mui/icons-material'
 import Layout from '../../components/Dashboard/Layout'
 import axiosInstance from '../../api/axiosConfig'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import { useNotification } from '../../utils/useNotification'
 
 interface Table {
   id: number
@@ -38,7 +39,7 @@ export default function AdminTablesPage() {
   const [editMode, setEditMode] = useState(false)
   const [selectedTable, setSelectedTable] = useState<Table | null>(null)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const { showSuccess, showError } = useNotification()
   const [formData, setFormData] = useState({
     number: 0,
     capacity: 2,
@@ -92,15 +93,15 @@ export default function AdminTablesPage() {
     try {
       if (editMode && selectedTable) {
         await axiosInstance.put(`/Tables/${selectedTable.id}`, formData)
-        setSuccess('Mesa actualizada exitosamente')
+        showSuccess('Mesa actualizada exitosamente')
       } else {
         await axiosInstance.post('/Tables', formData)
-        setSuccess('Mesa creada exitosamente')
+        showSuccess('Mesa creada exitosamente')
       }
       handleCloseDialog()
       loadTables()
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al guardar la mesa')
+      showError(err.response?.data?.message || 'Error al guardar la mesa')
     }
   }
 
@@ -109,10 +110,10 @@ export default function AdminTablesPage() {
 
     try {
       await axiosInstance.delete(`/Tables/${id}`)
-      setSuccess('Mesa eliminada exitosamente')
+      showSuccess('Mesa eliminada exitosamente')
       loadTables()
     } catch (err) {
-      setError('Error al eliminar la mesa')
+      showError('Error al eliminar la mesa')
     }
   }
 
@@ -121,10 +122,10 @@ export default function AdminTablesPage() {
       await axiosInstance.put(`/Tables/${table.id}`, {
         isActive: !table.isActive
       })
-      setSuccess(`Mesa ${!table.isActive ? 'activada' : 'desactivada'} exitosamente`)
+      showSuccess(`Mesa ${!table.isActive ? 'activada' : 'desactivada'} exitosamente`)
       loadTables()
     } catch (err) {
-      setError('Error al cambiar el estado de la mesa')
+      showError('Error al cambiar el estado de la mesa')
     }
   }
 
@@ -172,12 +173,6 @@ export default function AdminTablesPage() {
         {error && (
           <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
             {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity='success' onClose={() => setSuccess('')} sx={{ mb: 3 }}>
-            {success}
           </Alert>
         )}
 

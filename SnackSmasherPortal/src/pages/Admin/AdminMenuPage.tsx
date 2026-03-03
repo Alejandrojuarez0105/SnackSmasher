@@ -25,6 +25,7 @@ import { Add, Edit, Delete, Restaurant } from '@mui/icons-material'
 import Layout from '../../components/Dashboard/Layout'
 import axiosInstance from '../../api/axiosConfig'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import { useNotification } from '../../utils/useNotification'
 
 interface MenuCategory {
   id: number
@@ -51,7 +52,7 @@ export default function AdminMenuPage() {
   const [editMode, setEditMode] = useState(false)
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const { showSuccess, showError } = useNotification()
   const [tabValue, setTabValue] = useState(0)
   const [formData, setFormData] = useState({
     name: '',
@@ -127,22 +128,22 @@ export default function AdminMenuPage() {
         try {
           new URL(formData.imageUrl); // Verifica que sea una URL válida
           } catch {
-            setError('La URL de la imagen no es válida');
+            showError('La URL de la imagen no es válida');
             return;
           }
         }
         
       if (editMode && selectedItem) {
         await axiosInstance.put(`/Menu/items/${selectedItem.id}`, formData)
-        setSuccess('Item actualizado exitosamente')
+        showSuccess('Item actualizado exitosamente')
       } else {
         await axiosInstance.post('/Menu/items', formData)
-        setSuccess('Item creado exitosamente')
+        showSuccess('Item creado exitosamente')
       }
       handleCloseDialog()
       loadData()
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al guardar el item')
+      showError(err.response?.data?.message || 'Error al guardar el item')
     }
   }
 
@@ -151,10 +152,10 @@ export default function AdminMenuPage() {
 
     try {
       await axiosInstance.delete(`/Menu/items/${id}`)
-      setSuccess('Item eliminado exitosamente')
+      showSuccess('Item eliminado exitosamente')
       loadData()
     } catch (err) {
-      setError('Error al eliminar el item')
+      showError('Error al eliminar el item')
     }
   }
 
@@ -163,10 +164,10 @@ export default function AdminMenuPage() {
       await axiosInstance.put(`/Menu/items/${item.id}`, {
         isAvailable: !item.isAvailable
       })
-      setSuccess(`Item ${!item.isAvailable ? 'activado' : 'desactivado'} exitosamente`)
+      showSuccess(`Item ${!item.isAvailable ? 'activado' : 'desactivado'} exitosamente`)
       loadData()
     } catch (err) {
-      setError('Error al cambiar la disponibilidad')
+      showError('Error al cambiar la disponibilidad')
     }
   }
 
@@ -218,12 +219,6 @@ export default function AdminMenuPage() {
         {error && (
           <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
             {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity='success' onClose={() => setSuccess('')} sx={{ mb: 3 }}>
-            {success}
           </Alert>
         )}
 

@@ -31,6 +31,7 @@ export default function VideogamesPage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const { showSuccess, showError } = useNotification()
+  const [error, setError] = useState('')
   const [videogames, setVideogames] = useState<VideogameDto[]>([])
   const [filteredGames, setFilteredGames] = useState<VideogameDto[]>([])
   const [selectedGame, setSelectedGame] = useState<VideogameDto | null>(null)
@@ -70,7 +71,7 @@ export default function VideogamesPage() {
       setVideogames(data)
       setFilteredGames(data)
     } catch (err: any) {
-      showError('Error al cargar los videojuegos')
+      setError('Error al cargar los videojuegos')
       console.error(err)
     } finally {
       setLoading(false)
@@ -234,6 +235,12 @@ export default function VideogamesPage() {
             </TextField>
           </Grid>
         </Grid>
+
+        {error && (
+          <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
+            {error}
+            </Alert>
+          )}
 
         {/* Resultados y botón de limpiar filtros */}
         <Box

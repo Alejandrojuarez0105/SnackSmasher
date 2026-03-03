@@ -22,6 +22,7 @@ import { Add, Edit, Delete, Event as EventIcon } from '@mui/icons-material'
 import Layout from '../../components/Dashboard/Layout'
 import axiosInstance from '../../api/axiosConfig'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import { useNotification } from '../../utils/useNotification'
 
 interface Event {
   id: number
@@ -41,7 +42,7 @@ export default function AdminEventsPage() {
   const [editMode, setEditMode] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const { showSuccess, showError } = useNotification()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -107,22 +108,22 @@ export default function AdminEventsPage() {
         try {
           new URL(formData.imageUrl); // Verifica que sea una URL válida
           } catch {
-            setError('La URL de la imagen no es válida');
+            showError('La URL de la imagen no es válida');
             return;
           }
         }
         
       if (editMode && selectedEvent) {
         await axiosInstance.put(`/Events/${selectedEvent.id}`, formData)
-        setSuccess('Evento actualizado exitosamente')
+        showSuccess('Evento actualizado exitosamente')
       } else {
         await axiosInstance.post('/Events', formData)
-        setSuccess('Evento creado exitosamente')
+        showSuccess('Evento creado exitosamente')
       }
       handleCloseDialog()
       loadEvents()
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al guardar el evento')
+      showError(err.response?.data?.message || 'Error al guardar el evento')
     }
   }
 
@@ -131,10 +132,10 @@ export default function AdminEventsPage() {
 
     try {
       await axiosInstance.delete(`/Events/${id}`)
-      setSuccess('Evento eliminado exitosamente')
+      showSuccess('Evento eliminado exitosamente')
       loadEvents()
     } catch (err) {
-      setError('Error al eliminar el evento')
+      showError('Error al eliminar el evento')
     }
   }
 
@@ -143,10 +144,10 @@ export default function AdminEventsPage() {
       await axiosInstance.put(`/Events/${event.id}`, {
         isActive: !event.isActive
       })
-      setSuccess(`Evento ${!event.isActive ? 'activado' : 'desactivado'} exitosamente`)
+      showSuccess(`Evento ${!event.isActive ? 'activado' : 'desactivado'} exitosamente`)
       loadEvents()
     } catch (err) {
-      setError('Error al cambiar el estado del evento')
+      showError('Error al cambiar el estado del evento')
     }
   }
 
@@ -194,12 +195,6 @@ export default function AdminEventsPage() {
         {error && (
           <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
             {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity='success' onClose={() => setSuccess('')} sx={{ mb: 3 }}>
-            {success}
           </Alert>
         )}
 

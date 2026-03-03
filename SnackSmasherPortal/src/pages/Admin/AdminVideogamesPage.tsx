@@ -22,6 +22,7 @@ import { Add, Edit, Delete, SportsEsports } from '@mui/icons-material'
 import Layout from '../../components/Dashboard/Layout'
 import axiosInstance from '../../api/axiosConfig'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import { useNotification } from '../../utils/useNotification'
 
 interface Videogame {
   id: number
@@ -44,7 +45,7 @@ export default function AdminVideogamesPage() {
   const [editMode, setEditMode] = useState(false)
   const [selectedGame, setSelectedGame] = useState<Videogame | null>(null)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const { showSuccess, showError } = useNotification()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -116,22 +117,22 @@ export default function AdminVideogamesPage() {
         try {
           new URL(formData.imageUrl); // Verifica que sea una URL válida
           } catch {
-            setError('La URL de la imagen no es válida');
+            showError('La URL de la imagen no es válida');
             return;
           }
         }
         
         if (editMode && selectedGame) {
           await axiosInstance.put(`/Videogames/${selectedGame.id}`, formData)
-          setSuccess('Videojuego actualizado exitosamente')
+          showSuccess('Videojuego actualizado exitosamente')
         } else {
           await axiosInstance.post('/Videogames', formData)
-          setSuccess('Videojuego creado exitosamente')
+          showSuccess('Videojuego creado exitosamente')
         }
         handleCloseDialog()
         loadVideogames()
       } catch (err: any) {
-        setError(err.response?.data?.message || 'Error al guardar el videojuego')
+        showError(err.response?.data?.message || 'Error al guardar el videojuego')
       }
     }
     
@@ -139,10 +140,10 @@ export default function AdminVideogamesPage() {
       if (!window.confirm('¿Estás seguro de eliminar este videojuego?')) return
       try {
         await axiosInstance.delete(`/Videogames/${id}`)
-        setSuccess('Videojuego eliminado exitosamente')
+        showSuccess('Videojuego eliminado exitosamente')
         loadVideogames()
       } catch (err) {
-        setError('Error al eliminar el videojuego')
+        showError('Error al eliminar el videojuego')
       }
     }
     
@@ -190,12 +191,6 @@ export default function AdminVideogamesPage() {
         {error && (
           <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>
             {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity='success' onClose={() => setSuccess('')} sx={{ mb: 3 }}>
-            {success}
           </Alert>
         )}
 
