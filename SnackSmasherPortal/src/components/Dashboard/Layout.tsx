@@ -27,7 +27,8 @@ import {
   Event as EventIcon,
   Person as PersonIcon,
   Logout as LogoutIcon,
-  AdminPanelSettings as AdminIcon
+  AdminPanelSettings as AdminIcon,
+  TableRestaurant
 } from '@mui/icons-material'
 import { useAuth } from '../../context/AuthContext'
 
@@ -67,6 +68,7 @@ export default function Layout({ children }: LayoutProps) {
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Videojuegos', icon: <GamesIcon />, path: '/videogames' },
     { text: 'Reservas', icon: <ReservationsIcon />, path: '/reservations' },
+    { text: 'Reserva de Mesas', icon: <TableRestaurant />, path: '/table-reservations' },
     { text: 'Menú', icon: <MenuRestaurantIcon />, path: '/menu' },
     { text: 'Eventos', icon: <EventIcon />, path: '/events' }
   ]

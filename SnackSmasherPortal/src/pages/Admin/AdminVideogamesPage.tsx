@@ -147,6 +147,19 @@ export default function AdminVideogamesPage() {
       }
     }
     
+    const handleToggleActive = async (game: Videogame) => {
+      try {
+        await axiosInstance.put(`/Videogames/${game.id}`, {
+          ...game,
+          isAvailable: !game.isAvailable,
+        });
+        showSuccess(`Videojuego ${!game.isAvailable ? 'activado' : 'desactivado'} exitosamente`)
+        loadVideogames()
+      } catch (err) {
+        showError('Error al actualizar la disponibilidad del videojuego')
+      }
+    };
+
     if (loading) {
     return (
       <Layout>
@@ -200,7 +213,8 @@ export default function AdminVideogamesPage() {
               <Card
                 sx={{
                   border: '2px solid rgba(0, 255, 255, 0.3)',
-                  boxShadow: '0 0 20px rgba(0, 255, 255, 0.2)'
+                  boxShadow: '0 0 20px rgba(0, 255, 255, 0.2)',
+                  opacity: game.isAvailable ? 1 : 0.6,
                 }}
               >
                 <Box
@@ -219,9 +233,16 @@ export default function AdminVideogamesPage() {
                   )}
                 </Box>
                 <CardContent>
-                  <Typography variant='h6' gutterBottom sx={{ fontWeight: 700 }}>
-                    {game.title}
-                  </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                    <Typography variant='h6' gutterBottom sx={{ fontWeight: 700 }}>
+                      {game.title}
+                    </Typography>
+                  <Chip
+                    label={game.isAvailable ? 'Activo' : 'Inactivo'}
+                    size='small'
+                    color={game.isAvailable ? 'success' : 'default'}
+                  />
+                </Box>
                   <Box sx={{ mb: 2 }}>
                     <Chip label={game.genre} size='small' sx={{ mr: 1 }} />
                     <Chip label={game.platform} size='small' />
@@ -233,13 +254,27 @@ export default function AdminVideogamesPage() {
                     Duración máxima: {game.maxSessionMinutes} min
                   </Typography>
                 </CardContent>
-                <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
-                  <IconButton color='primary' onClick={() => handleOpenDialog(game)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton color='error' onClick={() => handleDelete(game.id)}>
+                <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                  <Button
+                    size='small'
+                    onClick={() => handleToggleActive(game)}
+                  >
+                    {game.isAvailable ? 'Desactivar' : 'Activar'}
+                  </Button>
+                  <Box>
+                    <IconButton 
+                      color='primary' 
+                      onClick={() => handleOpenDialog(game)}
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton 
+                    color='error' 
+                    onClick={() => handleDelete(game.id)}
+                  >
                     <Delete />
                   </IconButton>
+                  </Box>
                 </CardActions>
               </Card>
             </Grid>

@@ -17,6 +17,7 @@ import AdminEventsPage from '../pages/Admin/AdminEventsPage'
 import AdminTablesPage from '../pages/Admin/AdminTablesPage'
 import AdminMenuPage from '../pages/Admin/AdminMenuPage'
 import GameReviewsPage from '../pages/GameReviewsPage'
+import TableReservationsPage from '../pages/TableReservationsPage'
 
 // Componente para rutas protegidas
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
@@ -120,6 +121,15 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path='/table-reservations'
+        element={
+          <ProtectedRoute>
+            <TableReservationsPage />
           </ProtectedRoute>
         }
       />

@@ -106,6 +106,21 @@ export default function VideogamesPage() {
   const handleReservationSubmit = async () => {
     if (!selectedGame) return
 
+    //Validad que la fecha de reserva no sea en el pasado
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(reservationForm.reservationDate);
+    if (selectedDate < today) {
+      showError('No puedes hacer reservas en el pasado');
+      return;
+    }
+
+    // Validar que la hora de inicio sea menor que la hora de fin
+    if (reservationForm.startTime >= reservationForm.endTime) {
+      showError('La hora de inicio debe ser menor que la hora de fin');
+      return;
+    }
+
     try {
       const reservationData: CreateGameReservationDto = {
         videogameId: selectedGame.id,
