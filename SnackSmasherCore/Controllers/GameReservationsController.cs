@@ -85,6 +85,23 @@ namespace SnackSmasherCore.Controllers
             return Ok(result);
         }
 
+        [HttpPut("{id}/confirm")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ConfirmReservation(int id)
+        {
+            var reservation = await _gameReservationService.GetReservationById(id);
+            if (reservation == null)
+                return NotFound(new { message = "Reserva no encontrada" });
+
+            // Actualizar el estado a "Confirmed"
+            var updated = await _gameReservationService.UpdateReservation(id, new UpdateGameReservationDto
+            {
+                Status = "Confirmed"
+            });
+
+            return Ok(updated);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReservation(int id)
         {
