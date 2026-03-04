@@ -67,12 +67,13 @@ export default function TableReservationsPage() {
         const activeTables = tablesRes.data.filter((t: Table) => t.isActive);
         setTables(activeTables);
     
-        // Cargar videojuegos disponibles
+        // Cargar videojuegos disponibles (solo activos, sin importar copias)
         const gamesData = await videogamesAPI.getAll();
-        const availableGames = gamesData.filter((g: VideogameDto) => 
-            g.isAvailable && g.availableCopies > 0
-        );
+        const availableGames = gamesData.filter((g: VideogameDto) =>  g.isAvailable);
         setVideogames(availableGames);
+
+        console.log('Mesas cargadas:', activeTables.length);
+        console.log('Juegos disponibles:', availableGames.length);
     
     } catch (err) {
         console.error('Error al cargar datos:', err);
@@ -125,6 +126,15 @@ export default function TableReservationsPage() {
     if (formData.startTime >= formData.endTime) {
       showError('La hora de inicio debe ser menor que la hora de fin');
       return;
+    }
+
+    // Si incluye juego, validar que haya copias disponibles
+    if (includeGame && formData.videogameId > 0) {
+        const selectedGame = videogames.find(g => g.id === formData.videogameId);
+        if (!selectedGame || selectedGame.availableCopies === 0) {
+            showError('El juego seleccionado no tiene copias disponibles');
+            return;
+        }
     }
 
     try {
@@ -314,25 +324,58 @@ export default function TableReservationsPage() {
 
               {includeGame && (
                 <Grid item xs={12}>
-                  <TextField
+                    <TextField
                     fullWidth
                     select
                     label="Selecciona un Videojuego"
                     value={formData.videogameId}
                     onChange={(e) => setFormData({ ...formData, videogameId: parseInt(e.target.value) })}
                     required={includeGame}
-                  >
+                    helperText={
+                        videogames.length === 0 
+                        ? "No hay juegos activos en este momento" 
+                        : "Los juegos sin copias disponibles aparecen deshabilitados"
+                    }
+                >
                     <MenuItem value={0}>
-                      <em>Selecciona un juego</em>
+                    <em>Selecciona un juego</em>
                     </MenuItem>
-                    {videogames.map((game) => (
-                      <MenuItem key={game.id} value={game.id}>
-                        {game.title} ({game.platform}) - {game.availableCopies} disponibles
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-              )}
+                    {videogames.length === 0 ? (
+                        <MenuItem value={0} disabled>
+                            <em>No hay juegos disponibles</em>
+                            </MenuItem>
+                            ) : (
+                                videogames.map((game) => (
+                                <MenuItem 
+                                key={game.id} 
+                                value={game.id}
+                                disabled={game.availableCopies === 0}
+                                sx={{
+                                    opacity: game.availableCopies === 0 ? 0.5 : 1,
+                                    '&.Mui-disabled': {
+                                        color: 'text.secondary',
+                                        textDecoration: 'line-through',
+                                    },
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                    <span>
+                                        {game.title} ({game.platform})
+                                        </span>
+                                        <span style={{ marginLeft: '8px', fontWeight: 'bold' }}>
+                                            {game.availableCopies === 0 ? (
+                                                <span style={{ color: '#ff0055' }}>SIN COPIAS</span>
+                                            ) : (
+                                            <span style={{ color: '#00ff88' }}>{game.availableCopies} disponibles</span>
+                                        )}
+                                    </span>
+                                </Box>
+                            </MenuItem>
+                        ))
+                    )}
+                </TextField>
+            </Grid>
+        )}
 
               <Grid item xs={12}>
                 <TextField

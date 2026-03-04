@@ -68,8 +68,9 @@ export default function VideogamesPage() {
     try {
       setLoading(true)
       const data = await videogamesAPI.getAll()
-      setVideogames(data)
-      setFilteredGames(data)
+      
+      setVideogames(data.filter(game => game.isAvailable)); // Solo mostrar juegos disponibles
+      setFilteredGames(data.filter(game => game.isAvailable))
     } catch (err: any) {
       setError('Error al cargar los videojuegos')
       console.error(err)
@@ -357,9 +358,25 @@ export default function VideogamesPage() {
                     </Box>
                   )}
 
-                  <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-                    Copias disponibles: {game.availableCopies}/{game.totalCopies}
-                  </Typography>
+                  <Typography
+                  variant='body2'
+                  color={game.availableCopies > 0 ? 'success.main' : 'warning.main'}
+                  sx={{ fontWeight: 600, mb: 1 }}
+                  >
+                    {game.availableCopies > 0
+                    ? ` ${game.availableCopies} copias disponibles`
+                    : '⚠️ Todas las copias están reservadas'}
+                    </Typography>
+                    
+                    {game.availableCopies === 0 && (
+                      <Typography
+                      variant='caption'
+                      color='text.secondary'
+                      sx={{ display: 'block', mb: 2 }}
+                      >
+                        El juego estará disponible cuando se liberen las reservas
+                        </Typography>
+                      )}
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                       <Button
@@ -367,8 +384,9 @@ export default function VideogamesPage() {
                         variant='contained'
                         disabled={game.availableCopies === 0}
                         onClick={() => handleReserve(game)}
+                        color={game.availableCopies === 0 ? 'error' : 'primary'}
                       >
-                        {game.availableCopies === 0 ? 'No Disponible' : 'Reservar'}
+                        {game.availableCopies === 0 ? 'Sin copias ahora' : 'Reservar'}
                       </Button>
                       <Button
                         variant='outlined'

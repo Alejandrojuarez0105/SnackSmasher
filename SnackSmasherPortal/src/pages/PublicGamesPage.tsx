@@ -50,8 +50,8 @@ export default function PublicGamesPage() {
     try {
       setLoading(true);
       const data = await videogamesAPI.getAll();
-      setVideogames(data);
-      setFilteredGames(data);
+      setVideogames(data.filter(game => game.isAvailable)); // Solo mostrar juegos disponibles
+      setFilteredGames(data.filter(game => game.isAvailable));
     } catch (err: any) {
       setError('Error al cargar los videojuegos');
       console.error(err);
@@ -276,9 +276,18 @@ export default function PublicGamesPage() {
                     sx={{ fontWeight: 600 }}
                   >
                     {game.availableCopies > 0
-                      ? `${game.availableCopies} copias disponibles`
-                      : 'No disponible'}
+                      ? ` ${game.availableCopies} copias disponibles`
+                      : '⚠️ Todas las copias están reservadas'}
                   </Typography>
+                  {game.availableCopies === 0 && (
+                    <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: 'block' }}
+                    >
+                      El juego estará disponible cuando se liberen las reservas
+                      </Typography>
+                    )}
                 </CardContent>
               </Card>
             </Grid>

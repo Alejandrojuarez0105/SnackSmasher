@@ -24,14 +24,16 @@ import {
   Email,
   AdminPanelSettings,
   Edit,
-  CalendarToday
+  CalendarToday,
+  Star,
+  Delete
 } from '@mui/icons-material'
 import Layout from '../components/Dashboard/Layout'
 import { useAuth } from '../context/AuthContext'
 import { reviewsAPI, ReviewDto } from '../api/reviews'
 import { useNavigate } from 'react-router-dom'
-import { Star, Delete } from '@mui/icons-material'
 import { useNotification } from '../utils/useNotification'
+import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations';
 
 export default function ProfilePage() {
   const { user, isAdmin } = useAuth()
@@ -50,11 +52,12 @@ export default function ProfilePage() {
   const navigate = useNavigate()
   const [myReviews, setMyReviews] = useState<ReviewDto[]>([])
   const [loadingReviews, setLoadingReviews] = useState(false)
-  const [myReservations] = useState<any[]>([])
+  const [myReservations, setMyReservations] = useState<GameReservationDto[]>([])
 
   useEffect(() => {
     if (user?.id) {
       loadMyReviews()
+      loadMyReservations()
     }
   }, [user])
 
@@ -69,6 +72,17 @@ export default function ProfilePage() {
       console.error('Error al cargar reseñas:', err)
     } finally {
       setLoadingReviews(false)
+    }
+  }
+
+  const loadMyReservations = async () => {
+    if (!user?.id) return
+
+    try {
+      const reservations = await gameReservationsAPI.getByUser(user.id)
+      setMyReservations(reservations)
+    } catch (err) {
+      console.error('Error al cargar reservas:', err)
     }
   }
 
