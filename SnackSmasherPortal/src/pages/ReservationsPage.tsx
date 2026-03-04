@@ -24,6 +24,7 @@ import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations
 import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { useNotification } from '../utils/useNotification'
+import axiosInstance from '../api/axiosConfig'
 
 export default function ReservationsPage() {
   const { user, isAdmin } = useAuth()
@@ -68,6 +69,16 @@ export default function ReservationsPage() {
       showError('Error al cancelar la reserva')
     }
   }
+
+  const handleConfirmReservation = async (id: number) => {
+    try {
+      await axiosInstance.put(`/GameReservations/${id}/confirm`);
+      showSuccess('Reserva confirmada exitosamente');
+      loadReservations();
+    } catch (err) {
+      showError('Error al confirmar la reserva');
+    }
+  };
 
   const activeReservations = gameReservations.filter(r => r.status === 'Active')
   const pastReservations = gameReservations.filter(r => r.status !== 'Active')
@@ -372,17 +383,34 @@ export default function ReservationsPage() {
                       </Typography>
 
                       {reservation.status === 'Active' && (
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Button
+                          fullWidth
+                          variant="contained"
+                          color="success"
+                          onClick={() => handleConfirmReservation(reservation.id)}
+                        >
+                          Confirmar Reserva
+                          </Button>
                         <Button
                           fullWidth
                           variant='outlined'
                           color='error'
                           startIcon={<Cancel />}
-                          sx={{ mt: 2 }}
                           onClick={() => handleCancelReservation(reservation.id)}
                         >
                           Cancelar Reserva
                         </Button>
+                        </Box>
                       )}
+                      {reservation.status === 'Confirmed' && (
+                        <Chip
+                        label="Confirmada"
+                        color="success"
+                        icon={<CheckCircle />}
+                        sx={{ width: '100%' }}
+                        />
+                        )}
                     </CardContent>
                   </Card>
                 </Grid>
