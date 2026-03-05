@@ -140,7 +140,7 @@ namespace SnackSmasherCore.Services
             var hasOverlap = await _context.TableReservations
                 .Where(tr => tr.TableId == createDto.TableId &&
                             tr.ReservationDate == createDto.ReservationDate &&
-                            tr.Status == "Confirmed")
+                            tr.Status != "Cancelled")
                 .AnyAsync(tr =>
                     (createDto.StartTime >= tr.StartTime && createDto.StartTime < tr.EndTime) ||
                     (createDto.EndTime > tr.StartTime && createDto.EndTime <= tr.EndTime) ||
