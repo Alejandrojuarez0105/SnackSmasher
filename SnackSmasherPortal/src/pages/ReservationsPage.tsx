@@ -26,6 +26,21 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import { useNotification } from '../utils/useNotification'
 import axiosInstance from '../api/axiosConfig'
 
+interface TableReservationDto {
+  id: number;
+  userId: number;
+  username: string;
+  tableId: number;
+  tableNumber: number;
+  reservationDate: string;
+  startTime: string;
+  endTime: string;
+  guestCount: number;
+  notes?: string;
+  status: string;
+  createdAt: string;
+}
+
 export default function ReservationsPage() {
   const { user, isAdmin } = useAuth()
   const [loading, setLoading] = useState(true)
@@ -34,6 +49,7 @@ export default function ReservationsPage() {
   const [tabValue, setTabValue] = useState(0)
   const [gameReservations, setGameReservations] = useState<GameReservationDto[]>([])
   const [allReservations, setAllReservations] = useState<GameReservationDto[]>([])
+  const [tableReservations, setTableReservations] = useState<any[]>([])
 
   useEffect(() => {
     loadReservations()
@@ -46,12 +62,14 @@ export default function ReservationsPage() {
       setLoading(true)
 
       if (isAdmin) {
-        const allData = await gameReservationsAPI.getAll()
-        setAllReservations(allData)
+        const allGameData = await gameReservationsAPI.getAll()
+        setAllReservations(allGameData)
       }
 
-      const data = await gameReservationsAPI.getByUser(user.id)
-      setGameReservations(data)
+      const gameData = await gameReservationsAPI.getByUser(user.id)
+      setGameReservations(gameData)
+      const tableData = await axiosInstance.get(`/TableReservations/user/${user.id}`)
+      setTableReservations(tableData.data)
     } catch (err: any) {
       setError('Error al cargar las reservas')
       console.error(err)
@@ -78,10 +96,22 @@ export default function ReservationsPage() {
     } catch (err) {
       showError('Error al confirmar la reserva');
     }
-  };
+  }
+
+    const handleCancelTableReservation = async (id: number) => {
+    try {
+      await axiosInstance.put(`/TableReservations/${id}`, { Status: 'Cancelled' })
+      showSuccess('Reserva de mesa cancelada exitosamente')
+      loadReservations()
+    } catch (err) {
+      showError('Error al cancelar la reserva de mesa')
+    }
+  }
 
   const activeReservations = gameReservations.filter(r => r.status === 'Active')
   const pastReservations = gameReservations.filter(r => r.status !== 'Active')
+  const activeTableReservations = tableReservations.filter((r: any) => r.status === 'Active')
+  const pastTableReservations = tableReservations.filter((r: any) => r.status !== 'Active')
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -165,109 +195,195 @@ export default function ReservationsPage() {
           </Tabs>
         </Box>
 
-        {/* Reservas Activas */}
-        {tabValue === 0 && (
-          <Grid container spacing={3}>
-            {activeReservations.length === 0 ? (
-              <Grid item xs={12}>
-                <Card
+       {/* Reservas Activas */}
+{tabValue === 0 && (
+  <Grid container spacing={3}>
+    {activeReservations.length === 0 && activeTableReservations.length === 0 ? (
+      <Grid item xs={12}>
+        <Card
+          sx={{
+            border: '2px solid rgba(0, 255, 255, 0.3)',
+            background: 'rgba(0, 255, 255, 0.05)'
+          }}
+        >
+          <CardContent sx={{ textAlign: 'center', py: 6 }}>
+            <SportsEsports
+              sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }}
+            />
+            <Typography variant='h6' color='text.secondary'>
+              No tienes reservas activas
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Ve a la sección de Videojuegos o Mesas para crear una reserva
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+    ) : (
+      <>
+        {/* Reservas de Juegos */}
+        {activeReservations.map(reservation => (
+          <Grid item xs={12} md={6} key={`game-${reservation.id}`}>
+            <Card
+              sx={{
+                border: '2px solid rgba(0, 255, 255, 0.3)',
+                boxShadow: '0 0 20px rgba(0, 255, 255, 0.2)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 30px rgba(0, 255, 255, 0.3)'
+                }
+              }}
+            >
+              <CardContent>
+                <Box
                   sx={{
-                    border: '2px solid rgba(0, 255, 255, 0.3)',
-                    background: 'rgba(0, 255, 255, 0.05)'
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'start',
+                    mb: 2
                   }}
                 >
-                  <CardContent sx={{ textAlign: 'center', py: 6 }}>
-                    <SportsEsports
-                      sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }}
-                    />
-                    <Typography variant='h6' color='text.secondary'>
-                      No tienes reservas activas
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <SportsEsports sx={{ mr: 1, color: 'primary.main' }} />
+                    <Typography variant='h6' sx={{ fontWeight: 700 }}>
+                      {reservation.videogameTitle}
                     </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      Ve a la sección de Videojuegos para crear una reserva
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ) : (
-              activeReservations.map(reservation => (
-                <Grid item xs={12} md={6} key={reservation.id}>
-                  <Card
-                    sx={{
-                      border: '2px solid rgba(0, 255, 255, 0.3)',
-                      boxShadow: '0 0 20px rgba(0, 255, 255, 0.2)',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        transform: 'translateY(-4px)',
-                        boxShadow: '0 8px 30px rgba(0, 255, 255, 0.3)'
-                      }
-                    }}
+                  </Box>
+                  <Chip
+                    label={getStatusLabel(reservation.status)}
+                    color={getStatusColor(reservation.status) as any}
+                    size='small'
+                    icon={<CheckCircle />}
+                  />
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    sx={{ mb: 0.5 }}
                   >
-                    <CardContent>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'start',
-                          mb: 2
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <SportsEsports sx={{ mr: 1, color: 'primary.main' }} />
-                          <Typography variant='h6' sx={{ fontWeight: 700 }}>
-                            {reservation.videogameTitle}
-                          </Typography>
-                        </Box>
-                        <Chip
-                          label={getStatusLabel(reservation.status)}
-                          color={getStatusColor(reservation.status) as any}
-                          size='small'
-                          icon={<CheckCircle />}
-                        />
-                      </Box>
+                    📅 Fecha: {reservation.reservationDate}
+                  </Typography>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    sx={{ mb: 0.5 }}
+                  >
+                    ⏰ Horario: {reservation.startTime} - {reservation.endTime}
+                  </Typography>
+                  {reservation.notes && (
+                    <Typography
+                      variant='body2'
+                      color='text.secondary'
+                      sx={{ mt: 1 }}
+                    >
+                      📝 {reservation.notes}
+                    </Typography>
+                  )}
+                </Box>
 
-                      <Box sx={{ mb: 2 }}>
-                        <Typography
-                          variant='body2'
-                          color='text.secondary'
-                          sx={{ mb: 0.5 }}
-                        >
-                          📅 Fecha: {reservation.reservationDate}
-                        </Typography>
-                        <Typography
-                          variant='body2'
-                          color='text.secondary'
-                          sx={{ mb: 0.5 }}
-                        >
-                          ⏰ Horario: {reservation.startTime} - {reservation.endTime}
-                        </Typography>
-                        {reservation.notes && (
-                          <Typography
-                            variant='body2'
-                            color='text.secondary'
-                            sx={{ mt: 1 }}
-                          >
-                            📝 {reservation.notes}
-                          </Typography>
-                        )}
-                      </Box>
-
-                      <Button
-                        fullWidth
-                        variant='outlined'
-                        color='error'
-                        startIcon={<Cancel />}
-                        onClick={() => handleCancelReservation(reservation.id)}
-                      >
-                        Cancelar Reserva
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))
-            )}
+                <Button
+                  fullWidth
+                  variant='outlined'
+                  color='error'
+                  startIcon={<Cancel />}
+                  onClick={() => handleCancelReservation(reservation.id)}
+                >
+                  Cancelar Reserva
+                </Button>
+              </CardContent>
+            </Card>
           </Grid>
-        )}
+        ))}
+
+        {/* Reservas de Mesas */}
+        {activeTableReservations.map((reservation: any) => (
+          <Grid item xs={12} md={6} key={`table-${reservation.id}`}>
+            <Card
+              sx={{
+                border: '2px solid rgba(255, 0, 255, 0.3)',
+                boxShadow: '0 0 20px rgba(255, 0, 255, 0.2)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 30px rgba(255, 0, 255, 0.3)'
+                }
+              }}
+            >
+              <CardContent>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'start',
+                    mb: 2
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <EventSeat sx={{ mr: 1, color: 'secondary.main' }} />
+                    <Typography variant='h6' sx={{ fontWeight: 700 }}>
+                      Mesa #{reservation.tableNumber}
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label={getStatusLabel(reservation.status)}
+                    color={getStatusColor(reservation.status) as any}
+                    size='small'
+                  />
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    sx={{ mb: 0.5 }}
+                  >
+                    📅 Fecha: {reservation.reservationDate}
+                  </Typography>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    sx={{ mb: 0.5 }}
+                  >
+                    ⏰ Horario: {reservation.startTime} - {reservation.endTime}
+                  </Typography>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    sx={{ mb: 0.5 }}
+                  >
+                    👥 Invitados: {reservation.guestCount}
+                  </Typography>
+                  {reservation.notes && (
+                    <Typography
+                      variant='body2'
+                      color='text.secondary'
+                      sx={{ mt: 1 }}
+                    >
+                      📝 {reservation.notes}
+                    </Typography>
+                  )}
+                </Box>
+
+                <Button
+                  fullWidth
+                  variant='outlined'
+                  color='error'
+                  startIcon={<Cancel />}
+                  onClick={() => handleCancelTableReservation(reservation.id)}
+                >
+                  Cancelar Reserva de Mesa
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </>
+    )}
+  </Grid>
+)}
 
         {error && (
           <Alert severity='error' onClose={() => setError('')} sx={{ mb: 3 }}>

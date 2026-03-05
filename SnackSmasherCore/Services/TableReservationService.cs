@@ -159,7 +159,7 @@ namespace SnackSmasherCore.Services
                 GuestCount = createDto.GuestCount,
                 IsMatchEvent = createDto.IsMatchEvent,
                 Notes = createDto.Notes,
-                Status = "Confirmed",
+                Status = "Active",
                 CreatedAt = DateTime.Now
             };
 
