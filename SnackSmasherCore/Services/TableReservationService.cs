@@ -16,6 +16,25 @@ namespace SnackSmasherCore.Services
 
         public async Task<List<TableReservationDto>> GetAllReservations()
         {
+            // Actualizar reservas pasadas a "Completed"
+            var today = DateTime.Today;
+            var todayAsDateOnly = DateOnly.FromDateTime(today);
+
+            var pastReservations = await _context.TableReservations
+                .Where(tr => tr.Status == "Active"
+                    && tr.ReservationDate < todayAsDateOnly)
+                .ToListAsync();
+
+            foreach (var reservation in pastReservations)
+            {
+                reservation.Status = "Completed";
+            }
+
+            if (pastReservations.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
+
             return await _context.TableReservations
                 .Include(tr => tr.User)
                 .Include(tr => tr.Table)
@@ -43,6 +62,26 @@ namespace SnackSmasherCore.Services
 
         public async Task<List<TableReservationDto>> GetReservationsByUser(int userId)
         {
+            // Primero, actualizar reservas pasadas a "Completed"
+            var today = DateTime.Today;
+            var todayAsDateOnly = DateOnly.FromDateTime(today);
+
+            var pastReservations = await _context.TableReservations
+                .Where(tr => tr.UserId == userId
+                    && tr.Status == "Active"
+                    && tr.ReservationDate < todayAsDateOnly)
+                .ToListAsync();
+
+            foreach (var reservation in pastReservations)
+            {
+                reservation.Status = "Completed";
+            }
+
+            if (pastReservations.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
+
             return await _context.TableReservations
                 .Where(tr => tr.UserId == userId)
                 .Include(tr => tr.User)

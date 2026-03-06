@@ -16,7 +16,27 @@ namespace SnackSmasherCore.Services
 
         public async Task<List<GameReservationDto>> GetAllReservations()
         {
+            // Actualizar reservar pasadas a "Completed"
+            var today = DateTime.Today;
+            var todayAsDateOnly = DateOnly.FromDateTime(today);
+
+            var pastReservations = await _context.GameReservations
+                .Where(gr => gr.Status == "Active" &&
+                gr.ReservationDate < todayAsDateOnly)
+                .ToListAsync();
+
+            foreach (var reservation in pastReservations)
+            {
+                reservation.Status = "Completed";
+            }
+
+            if (pastReservations.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
+            
             return await _context.GameReservations
+                .AsNoTracking()
                 .Include(gr => gr.User)
                 .Include(gr => gr.Videogame)
                 .Select(gr => new GameReservationDto
@@ -40,7 +60,28 @@ namespace SnackSmasherCore.Services
 
         public async Task<List<GameReservationDto>> GetReservationsByUser(int userId)
         {
+            // Primero actualizar reservas pasadas a "Completed"
+            var today = DateTime.Today;
+            var todayAsDateOnly = DateOnly.FromDateTime(today);
+
+            var pastReservations = await _context.GameReservations
+                .Where(gr => gr.UserId == userId 
+                    && gr.Status == "Active" 
+                    && gr.ReservationDate < todayAsDateOnly)
+                .ToListAsync();
+
+            foreach (var reservation in pastReservations)
+            {
+                reservation.Status = "Completed";
+            }
+
+            if (pastReservations.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
+
             return await _context.GameReservations
+                .AsNoTracking()
                 .Where(gr => gr.UserId == userId)
                 .Include(gr => gr.User)
                 .Include(gr => gr.Videogame)
