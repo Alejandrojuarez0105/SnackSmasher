@@ -14,14 +14,13 @@ namespace SnackSmasherCore.Services
             _context = context;
         }
 
-        public async Task<List<TableReservationDto>> GetAllReservations()
+        private async Task UpdatePastReservations()
         {
-            // Actualizar reservas pasadas a "Completed"
             var today = DateTime.Today;
             var todayAsDateOnly = DateOnly.FromDateTime(today);
 
             var pastReservations = await _context.TableReservations
-                .Where(tr => tr.Status == "Active"
+                .Where(tr => (tr.Status == "Active" || tr.Status == "Confirmed")
                     && tr.ReservationDate < todayAsDateOnly)
                 .ToListAsync();
 
@@ -34,6 +33,11 @@ namespace SnackSmasherCore.Services
             {
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<List<TableReservationDto>> GetAllReservations()
+        {
+            await UpdatePastReservations();
 
             return await _context.TableReservations
                 .Include(tr => tr.User)
@@ -62,25 +66,7 @@ namespace SnackSmasherCore.Services
 
         public async Task<List<TableReservationDto>> GetReservationsByUser(int userId)
         {
-            // Primero, actualizar reservas pasadas a "Completed"
-            var today = DateTime.Today;
-            var todayAsDateOnly = DateOnly.FromDateTime(today);
-
-            var pastReservations = await _context.TableReservations
-                .Where(tr => tr.UserId == userId
-                    && tr.Status == "Active"
-                    && tr.ReservationDate < todayAsDateOnly)
-                .ToListAsync();
-
-            foreach (var reservation in pastReservations)
-            {
-                reservation.Status = "Completed";
-            }
-
-            if (pastReservations.Any())
-            {
-                await _context.SaveChangesAsync();
-            }
+            await UpdatePastReservations();
 
             return await _context.TableReservations
                 .Where(tr => tr.UserId == userId)

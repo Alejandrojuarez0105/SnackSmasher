@@ -177,12 +177,12 @@ export default function ReservationsPage() {
           >
             <Tab
               icon={<SportsEsports />}
-              label={`Mis Reservas Activas (${activeReservations.length})`}
+              label={`Mis Reservas Activas (${activeReservations.length + activeTableReservations.length})`}
               iconPosition='start'
             />
             <Tab
               icon={<EventSeat />}
-              label={`Mi Historial (${pastReservations.length})`}
+              label={`Mi Historial (${pastReservations.length + pastTableReservations.length})`}
               iconPosition='start'
             />
             {isAdmin && (

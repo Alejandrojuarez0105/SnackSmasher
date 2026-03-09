@@ -27,6 +27,7 @@ import axiosInstance from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../utils/useNotification';
 import { videogamesAPI, VideogameDto } from '../api/videogames';
+import TimeSelector from '../components/TimeSelector';
 
 interface Table {
   id: number;
@@ -251,7 +252,7 @@ export default function TableReservationsPage() {
           </DialogTitle>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   type="date"
@@ -264,24 +265,20 @@ export default function TableReservationsPage() {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="time"
-                  label="Hora de Inicio"
+                <TimeSelector
+                  label="Hora Inicio"
                   value={formData.startTime}
-                  onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                  InputLabelProps={{ shrink: true }}
+                  onChange={(value) => setFormData({ ...formData, startTime: value })
+                  }
                   required
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="time"
-                  label="Hora de Fin"
+              <Grid item xs={12}>
+                <TimeSelector
+                  label="Hora Fin"
                   value={formData.endTime}
-                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                  InputLabelProps={{ shrink: true }}
+                  onChange={(value) => setFormData({ ...formData, endTime: value })
+                  }
                   required
                 />
               </Grid>

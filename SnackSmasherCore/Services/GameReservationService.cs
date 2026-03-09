@@ -14,15 +14,14 @@ namespace SnackSmasherCore.Services
             _context = context;
         }
 
-        public async Task<List<GameReservationDto>> GetAllReservations()
+        private async Task UpdatePastReservations()
         {
-            // Actualizar reservar pasadas a "Completed"
             var today = DateTime.Today;
             var todayAsDateOnly = DateOnly.FromDateTime(today);
 
             var pastReservations = await _context.GameReservations
-                .Where(gr => gr.Status == "Active" &&
-                gr.ReservationDate < todayAsDateOnly)
+                .Where(gr => (gr.Status == "Active" || gr.Status == "Confirmed")
+                    && gr.ReservationDate < todayAsDateOnly)
                 .ToListAsync();
 
             foreach (var reservation in pastReservations)
@@ -34,7 +33,12 @@ namespace SnackSmasherCore.Services
             {
                 await _context.SaveChangesAsync();
             }
-            
+        }
+
+        public async Task<List<GameReservationDto>> GetAllReservations()
+        {
+            await UpdatePastReservations();
+
             return await _context.GameReservations
                 .AsNoTracking()
                 .Include(gr => gr.User)
@@ -60,25 +64,7 @@ namespace SnackSmasherCore.Services
 
         public async Task<List<GameReservationDto>> GetReservationsByUser(int userId)
         {
-            // Primero actualizar reservas pasadas a "Completed"
-            var today = DateTime.Today;
-            var todayAsDateOnly = DateOnly.FromDateTime(today);
-
-            var pastReservations = await _context.GameReservations
-                .Where(gr => gr.UserId == userId 
-                    && gr.Status == "Active" 
-                    && gr.ReservationDate < todayAsDateOnly)
-                .ToListAsync();
-
-            foreach (var reservation in pastReservations)
-            {
-                reservation.Status = "Completed";
-            }
-
-            if (pastReservations.Any())
-            {
-                await _context.SaveChangesAsync();
-            }
+            await UpdatePastReservations();
 
             return await _context.GameReservations
                 .AsNoTracking()

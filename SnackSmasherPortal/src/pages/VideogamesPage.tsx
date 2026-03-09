@@ -26,6 +26,7 @@ import { gameReservationsAPI, CreateGameReservationDto } from '../api/gameReserv
 import { reviewsAPI, CreateReviewDto } from '../api/reviews'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { useNotification } from '../utils/useNotification'
+import TimeSelector from '../components/TimeSelector'
 
 export default function VideogamesPage() {
   const navigate = useNavigate()
@@ -438,27 +439,21 @@ export default function VideogamesPage() {
                 sx={{ mb: 2 }}
                 inputProps={{ min: new Date().toISOString().split('T')[0] }}
               />
-              <TextField
-                fullWidth
-                type='time'
+              <TimeSelector
                 label='Hora de inicio'
                 value={reservationForm.startTime}
-                onChange={e =>
-                  setReservationForm({ ...reservationForm, startTime: e.target.value })
+                onChange={(value) =>
+                  setReservationForm({ ...reservationForm, startTime: value })
                 }
-                InputLabelProps={{ shrink: true }}
-                sx={{ mb: 2 }}
+                required
               />
-              <TextField
-                fullWidth
-                type='time'
+              <TimeSelector
                 label='Hora de fin'
                 value={reservationForm.endTime}
-                onChange={e =>
-                  setReservationForm({ ...reservationForm, endTime: e.target.value })
+                onChange={(value) =>
+                  setReservationForm({ ...reservationForm, endTime: value })
                 }
-                InputLabelProps={{ shrink: true }}
-                sx={{ mb: 2 }}
+                required
               />
               <TextField
                 fullWidth
