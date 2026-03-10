@@ -1,30 +1,29 @@
-import { useEffect, useState } from 'react'
 import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Button,
-  CircularProgress,
-  Alert,
-  Tabs,
-  Tab
-} from '@mui/material'
-import {
-  EventSeat,
-  SportsEsports,
+  AdminPanelSettings,
   Cancel,
   CheckCircle,
-  AdminPanelSettings
+  EventSeat,
+  SportsEsports
 } from '@mui/icons-material'
-import Layout from '../components/Dashboard/Layout'
-import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations'
-import { useAuth } from '../context/AuthContext'
-import LoadingSpinner from '../components/LoadingSpinner'
-import { useNotification } from '../utils/useNotification'
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Grid,
+  Tab,
+  Tabs,
+  Typography
+} from '@mui/material'
+import { useEffect, useState } from 'react'
 import axiosInstance from '../api/axiosConfig'
+import { GameReservationDto, gameReservationsAPI } from '../api/gameReservations'
+import Layout from '../components/Dashboard/Layout'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { useAuth } from '../context/AuthContext'
+import { useNotification } from '../utils/useNotification'
 
 interface TableReservationDto {
   id: number;
@@ -49,7 +48,8 @@ export default function ReservationsPage() {
   const [tabValue, setTabValue] = useState(0)
   const [gameReservations, setGameReservations] = useState<GameReservationDto[]>([])
   const [allReservations, setAllReservations] = useState<GameReservationDto[]>([])
-  const [tableReservations, setTableReservations] = useState<any[]>([])
+  const [tableReservations, setTableReservations] = useState<TableReservationDto[]>([])
+  const [allTableReservations, setAllTableReservations] = useState<TableReservationDto[]>([])
 
   useEffect(() => {
     loadReservations()
@@ -64,6 +64,9 @@ export default function ReservationsPage() {
       if (isAdmin) {
         const allGameData = await gameReservationsAPI.getAll()
         setAllReservations(allGameData)
+
+        const allTableData = await axiosInstance.get('/TableReservations')
+        setAllTableReservations(allTableData.data)
       }
 
       const gameData = await gameReservationsAPI.getByUser(user.id)
@@ -98,6 +101,16 @@ export default function ReservationsPage() {
     }
   }
 
+  const handleConfirmTableReservation = async (id: number) => {
+    try {
+      await axiosInstance.put(`/TableReservations/${id}`, { Status: 'Confirmed' });
+      showSuccess('Reserva de mesa confirmada exitosamente');
+      loadReservations();
+    } catch (err) {
+      showError('Error al confirmar la reserva de mesa');
+    }
+  }
+
     const handleCancelTableReservation = async (id: number) => {
     try {
       await axiosInstance.put(`/TableReservations/${id}`, { Status: 'Cancelled' })
@@ -117,6 +130,8 @@ export default function ReservationsPage() {
     switch (status) {
       case 'Active':
         return 'success'
+      case 'Confirmed':
+        return 'success'
       case 'Completed':
         return 'info'
       case 'Cancelled':
@@ -130,6 +145,8 @@ export default function ReservationsPage() {
     switch (status) {
       case 'Active':
         return 'Activa'
+      case 'Confirmed':
+        return 'Confirmada'
       case 'Completed':
         return 'Completada'
       case 'Cancelled':
@@ -188,7 +205,7 @@ export default function ReservationsPage() {
             {isAdmin && (
               <Tab
                 icon={<AdminPanelSettings />}
-                label={`Todas las Reservas (${allReservations.length})`}
+                label={`Todas las Reservas (${allReservations.length + allTableReservations.length})`}
                 iconPosition='start'
               />
             )}
@@ -299,7 +316,7 @@ export default function ReservationsPage() {
         ))}
 
         {/* Reservas de Mesas */}
-        {activeTableReservations.map((reservation: any) => (
+        {activeTableReservations.map((reservation: TableReservationDto) => (
           <Grid item xs={12} md={6} key={`table-${reservation.id}`}>
             <Card
               sx={{
@@ -394,7 +411,7 @@ export default function ReservationsPage() {
         {/* Historial */}
         {tabValue === 1 && (
           <Grid container spacing={3}>
-            {pastReservations.length === 0 ? (
+            {pastReservations.length === 0 && pastTableReservations.length === 0 ? (
               <Grid item xs={12}>
                 <Card
                   sx={{
@@ -411,8 +428,10 @@ export default function ReservationsPage() {
                 </Card>
               </Grid>
             ) : (
-              pastReservations.map(reservation => (
-                <Grid item xs={12} md={6} key={reservation.id}>
+              <>
+              {/* Historial de Juegos */}
+              {pastReservations.map(reservation => (
+                <Grid item xs={12} md={6} key={`game-past-${reservation.id}`}>
                   <Card
                     sx={{
                       border: '1px solid rgba(0, 255, 255, 0.2)',
@@ -450,14 +469,59 @@ export default function ReservationsPage() {
                     </CardContent>
                   </Card>
                 </Grid>
-              ))
+              ))}
+              {/* Historial de Mesas */}
+              {pastTableReservations.map((reservation: TableReservationDto) => (
+                <Grid item xs={12} md={6} key={`table-past-${reservation.id}`}>
+                  <Card
+                    sx={{
+                      border: '1px solid rgba(0, 255, 255, 0.2)',
+                      opacity: 0.8
+                    }}
+                  >
+                    <CardContent>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'start',
+                          mb: 2
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <EventSeat sx={{ mr: 1, color: 'text.secondary' }} />
+                          <Typography variant='h6' sx={{ fontWeight: 600 }}>
+                            Mesa #{reservation.tableNumber}
+                          </Typography>
+                        </Box>
+                        <Chip
+                          label={getStatusLabel(reservation.status)}
+                          color={getStatusColor(reservation.status) as any}
+                          size='small'
+                        />
+                      </Box>
+
+                      <Typography variant='body2' color='text.secondary' sx={{ mb: 0.5 }}>
+                        📅 {reservation.reservationDate}
+                      </Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        ⏰ {reservation.startTime} - {reservation.endTime}
+                      </Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        👥 {reservation.guestCount} personas
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </>
             )}
           </Grid>
         )}
         {/* Todas las Reservas (Solo Admin) */}
         {isAdmin && tabValue === 2 && (
           <Grid container spacing={3}>
-            {allReservations.length === 0 ? (
+            {allReservations.length === 0 && allTableReservations.length === 0 ? (
               <Grid item xs={12}>
                 <Card>
                   <CardContent sx={{ textAlign: 'center', py: 6 }}>
@@ -469,16 +533,26 @@ export default function ReservationsPage() {
                 </Card>
               </Grid>
             ) : (
-              allReservations.map(reservation => (
-                <Grid item xs={12} md={6} key={reservation.id}>
-                  <Card>
+              <>
+              {/* Reservas de Juegos */}
+              { allReservations.map(reservation => (
+                <Grid item xs={12} md={6} key={`admin-game-${reservation.id}`}>
+                  <Card
+                  sx={{
+                    border: '2px solid rgba(0, 255, 255, 0.3)',
+                    boxShadow: '0 0 20px rgba(0, 255, 255, 0.2)',
+                  }}
+                  >
                     <CardContent>
                       <Box
                         sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}
                       >
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <SportsEsports sx={{ mr: 1, color: 'primary.main' }} />
                         <Typography variant='h6' sx={{ fontWeight: 700 }}>
                           {reservation.videogameTitle}
                         </Typography>
+                        </Box>
                         <Chip
                           label={getStatusLabel(reservation.status)}
                           color={getStatusColor(reservation.status) as any}
@@ -527,14 +601,121 @@ export default function ReservationsPage() {
                         sx={{ width: '100%' }}
                         />
                         )}
+                        {reservation.status === 'Completed' && (
+                          <Chip
+                          label="Completada"
+                          color="info"
+                          sx={{ width: '100%' }}
+                          />
+                        )}
+
+                        {reservation.status === 'Cancelled' && (
+                          <Chip
+                          label="Cancelada"
+                          color="error"
+                          sx={{ width: '100%' }}
+                          />
+                        )}
                     </CardContent>
                   </Card>
                 </Grid>
-              ))
-            )}
-          </Grid>
-        )}
-      </Box>
-    </Layout>
+              ))}
+              {/* Reservas de Mesas */}
+              {allTableReservations.map((reservation: TableReservationDto) => (
+                <Grid item xs={12} md={6} key={`admin-table-${reservation.id}`}>
+                  <Card
+                  sx={{border: '2px solid rgba(255, 0, 255, 0.3)',
+                    boxShadow: '0 0 20px rgba(255, 0, 255, 0.2)',
+                  }}
+                  >
+                    <CardContent>
+                      <Box
+                      sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <EventSeat sx={{ mr: 1, color: 'secondary.main' }} />
+                          <Typography variant='h6' sx={{ fontWeight: 700 }}>
+                            Mesa #{reservation.tableNumber}
+                            </Typography>
+                            </Box>
+                            <Chip
+                            label={getStatusLabel(reservation.status)}
+                            color={getStatusColor(reservation.status) as any}
+                            size='small'
+                          />
+                        </Box>
+                        
+                      <Typography variant='body2' sx={{ mb: 1 }}>
+                        👤 Usuario: <strong>{reservation.username}</strong>
+                      </Typography>
+                      
+                      <Typography variant='body2'>
+                        📅 {reservation.reservationDate}
+                      </Typography>
+                      
+                      <Typography variant='body2'>
+                        ⏰ {reservation.startTime} - {reservation.endTime}
+                      </Typography>
+                      
+                      <Typography variant='body2' sx={{ mb: 2 }}>
+                        👥 Invitados: {reservation.guestCount}
+                      </Typography>
+                      
+                      {reservation.status === 'Active' && (
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Button
+                          fullWidth
+                          variant="contained"
+                          color="success"
+                          onClick={() => handleConfirmTableReservation(reservation.id)}
+                        >
+                          Confirmar reserva
+                          </Button>
+                          <Button
+                          fullWidth
+                          variant='outlined'
+                          color='error'
+                          startIcon={<Cancel />}
+                          onClick={() => handleCancelTableReservation(reservation.id)}
+                          >
+                            Cancelar reserva
+                            </Button>
+                            </Box>
+                          )}
+                
+                {reservation.status === 'Confirmed' && (
+                  <Chip
+                  label="Confirmada"
+                  color="success"
+                  icon={<CheckCircle />}
+                  sx={{ width: '100%' }}
+                  />
+                )}
+                
+                {reservation.status === 'Completed' && (
+                  <Chip
+                    label="Completada"
+                    color="info"
+                    sx={{ width: '100%' }}
+                  />
+                )}
+
+                {reservation.status === 'Cancelled' && (
+                  <Chip
+                    label="Cancelada"
+                    color="error"
+                    sx={{ width: '100%' }}
+                  />
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </>
+      )}
+    </Grid>
+  )}
+  </Box>
+  </Layout>
   )
 }

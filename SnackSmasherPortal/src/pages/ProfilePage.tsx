@@ -34,6 +34,7 @@ import { reviewsAPI, ReviewDto } from '../api/reviews'
 import { useNavigate } from 'react-router-dom'
 import { useNotification } from '../utils/useNotification'
 import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations';
+import axiosInstance from '../api/axiosConfig'
 
 export default function ProfilePage() {
   const { user, isAdmin } = useAuth()
@@ -53,11 +54,13 @@ export default function ProfilePage() {
   const [myReviews, setMyReviews] = useState<ReviewDto[]>([])
   const [loadingReviews, setLoadingReviews] = useState(false)
   const [myReservations, setMyReservations] = useState<GameReservationDto[]>([])
+  const [myTableReservations, setMyTableReservations] = useState<any[]>([])
 
   useEffect(() => {
     if (user?.id) {
       loadMyReviews()
       loadMyReservations()
+      loadMyTableReservations()
     }
   }, [user])
 
@@ -83,6 +86,19 @@ export default function ProfilePage() {
       setMyReservations(reservations)
     } catch (err) {
       console.error('Error al cargar reservas:', err)
+    }
+  }
+
+  const loadMyTableReservations = async () => {
+    if (!user?.id) return
+    
+    try {
+      const response = await axiosInstance.get(
+        `/TableReservations/user/${user.id}`
+      )
+      setMyTableReservations(response.data)
+    } catch (err) {
+      console.error('Error al cargar reservas de mesas:', err)
     }
   }
 
@@ -255,7 +271,7 @@ export default function ProfilePage() {
                         variant='h4'
                         sx={{ fontWeight: 700, color: 'primary.main' }}
                       >
-                        {myReservations?.length || 0}
+                        {(myReservations?.length || 0) + (myTableReservations?.length || 0)}
                       </Typography>
                       <Typography variant='caption' color='text.secondary'>
                         Reservas

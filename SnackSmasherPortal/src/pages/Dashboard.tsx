@@ -1,21 +1,21 @@
-import { useEffect, useState } from 'react'
+import { Event, EventSeat, SportsEsports, TrendingUp } from '@mui/icons-material'
 import {
+  Alert,
   Box,
-  Grid,
   Card,
   CardContent,
-  Typography,
-  CircularProgress,
-  Alert,
-  Chip
+  Chip,
+  Grid,
+  Typography
 } from '@mui/material'
-import { SportsEsports, Event, EventSeat, TrendingUp } from '@mui/icons-material'
+import { useEffect, useState } from 'react'
+import axiosInstance from '../api/axiosConfig'
+import { eventsAPI } from '../api/events'
+import { GameReservationDto, gameReservationsAPI } from '../api/gameReservations'
+import { VideogameDto, videogamesAPI } from '../api/videogames'
 import Layout from '../components/Dashboard/Layout'
-import { videogamesAPI, VideogameDto } from '../api/videogames'
-import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations'
-import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { eventsAPI, EventDto } from '../api/events'
+import { useAuth } from '../context/AuthContext'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [error, setError] = useState('')
   const [topGames, setTopGames] = useState<VideogameDto[]>([])
   const [myReservations, setMyReservations] = useState<GameReservationDto[]>([])
+  const [myTableReservations, setMyTableReservations] = useState<any[]>([])
   const [upcomingEvents, setUpcomingEvents] = useState([])
   const [stats, setStats] = useState({
     totalGames: 0,
@@ -37,19 +38,26 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true)
-      const [gamesData, topRatedData, reservationsData, eventsData] = await Promise.all([
+      const [gamesData, topRatedData, gameReservationsData, tableReservationsData, eventsData] = await Promise.all([
         videogamesAPI.getAll(),
         videogamesAPI.getTopRated(5),
         user?.id ? gameReservationsAPI.getByUser(user.id) : Promise.resolve([]),
+        user?.id ? axiosInstance.get(`/TableReservations/user/${user.id}`).then(res => res.data) : Promise.resolve([]),
         eventsAPI.getUpcoming()
       ])
 
       setTopGames(topRatedData)
-      setMyReservations(reservationsData.filter(r => r.status === 'Active').slice(0, 5))
-      setUpcomingEvents(eventsData.slice(0, 3))
+      setMyReservations(gameReservationsData.filter((r: any) => r.status === 'Active').slice(0, 5));
+      setMyTableReservations(tableReservationsData.filter((r: any) => r.status === 'Active').slice(0, 5));
+      setUpcomingEvents(eventsData.slice(0, 3));
+
+      const totalActiveReservations = 
+      gameReservationsData.filter((r: any) => r.status === 'Active').length +
+      tableReservationsData.filter((r: any) => r.status === 'Active').length;
+
       setStats({
         totalGames: gamesData.length,
-        activeReservations: reservationsData.filter(r => r.status === 'Active').length,
+        activeReservations: totalActiveReservations,
         upcomingEvents: eventsData.length
       })
     } catch (err: any) {

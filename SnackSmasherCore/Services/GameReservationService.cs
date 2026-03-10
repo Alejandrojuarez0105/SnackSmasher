@@ -16,12 +16,14 @@ namespace SnackSmasherCore.Services
 
         private async Task UpdatePastReservations()
         {
-            var today = DateTime.Today;
-            var todayAsDateOnly = DateOnly.FromDateTime(today);
+            var now = DateTime.Now;
+            var today = DateOnly.FromDateTime(now);
+            var currentTime = TimeOnly.FromDateTime(now);
 
             var pastReservations = await _context.GameReservations
                 .Where(gr => (gr.Status == "Active" || gr.Status == "Confirmed")
-                    && gr.ReservationDate < todayAsDateOnly)
+                    && (gr.ReservationDate < today ||
+                        (gr.ReservationDate == today && gr.EndTime < currentTime)))
                 .ToListAsync();
 
             foreach (var reservation in pastReservations)
