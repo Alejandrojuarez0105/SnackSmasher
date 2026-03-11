@@ -50,6 +50,7 @@ export default function ReservationsPage() {
   const [allReservations, setAllReservations] = useState<GameReservationDto[]>([])
   const [tableReservations, setTableReservations] = useState<TableReservationDto[]>([])
   const [allTableReservations, setAllTableReservations] = useState<TableReservationDto[]>([])
+  const [adminFilter, setAdminFilter] = useState<string>('all')
 
   useEffect(() => {
     loadReservations()
@@ -125,6 +126,26 @@ export default function ReservationsPage() {
   const pastReservations = gameReservations.filter(r => r.status !== 'Active')
   const activeTableReservations = tableReservations.filter((r: any) => r.status === 'Active')
   const pastTableReservations = tableReservations.filter((r: any) => r.status !== 'Active')
+  
+  const filteredAdminGameReservations = adminFilter === 'all' 
+  ? allReservations 
+  : allReservations.filter(r => {
+      if (adminFilter === 'active') return r.status === 'Active';
+      if (adminFilter === 'confirmed') return r.status === 'Confirmed';
+      if (adminFilter === 'completed') return r.status === 'Completed';
+      if (adminFilter === 'cancelled') return r.status === 'Cancelled';
+      return true;
+    })
+    
+  const filteredAdminTableReservations = adminFilter === 'all'
+  ? allTableReservations
+  : allTableReservations.filter((r: any) => {
+      if (adminFilter === 'active') return r.status === 'Active';
+      if (adminFilter === 'confirmed') return r.status === 'Confirmed';
+      if (adminFilter === 'completed') return r.status === 'Completed';
+      if (adminFilter === 'cancelled') return r.status === 'Cancelled';
+      return true;
+    })
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -518,10 +539,54 @@ export default function ReservationsPage() {
             )}
           </Grid>
         )}
+        {/* Filtros para Admin */}
+        {isAdmin && tabValue === 2 && (
+          <Box sx={{ mb: 3, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Button
+              variant={adminFilter === 'all' ? 'contained' : 'outlined'}
+              size='small'
+              onClick={() => setAdminFilter('all')}
+            >
+              Todas ({allReservations.length + allTableReservations.length})
+            </Button>
+            <Button
+              variant={adminFilter === 'active' ? 'contained' : 'outlined'}
+              size='small'
+              color='warning'
+              onClick={() => setAdminFilter('active')}
+            >
+              Activas ({allReservations.filter(r => r.status === 'Active').length + allTableReservations.filter((r: any) => r.status === 'Active').length})
+            </Button>
+            <Button
+              variant={adminFilter === 'confirmed' ? 'contained' : 'outlined'}
+              size='small'
+              color='success'
+              onClick={() => setAdminFilter('confirmed')}
+            >
+              Confirmadas ({allReservations.filter(r => r.status === 'Confirmed').length + allTableReservations.filter((r: any) => r.status === 'Confirmed').length})
+            </Button>
+            <Button
+              variant={adminFilter === 'completed' ? 'contained' : 'outlined'}
+              size='small'
+              color='info'
+              onClick={() => setAdminFilter('completed')}
+            >
+              Completadas ({allReservations.filter(r => r.status === 'Completed').length + allTableReservations.filter((r: any) => r.status === 'Completed').length})
+            </Button>
+            <Button
+              variant={adminFilter === 'cancelled' ? 'contained' : 'outlined'}
+              size='small'
+              color='error'
+              onClick={() => setAdminFilter('cancelled')}
+            >
+              Canceladas ({allReservations.filter(r => r.status === 'Cancelled').length + allTableReservations.filter((r: any) => r.status === 'Cancelled').length})
+            </Button>
+          </Box>
+        )}
         {/* Todas las Reservas (Solo Admin) */}
         {isAdmin && tabValue === 2 && (
           <Grid container spacing={3}>
-            {allReservations.length === 0 && allTableReservations.length === 0 ? (
+            {filteredAdminGameReservations.length === 0 && filteredAdminTableReservations.length === 0 ? (
               <Grid item xs={12}>
                 <Card>
                   <CardContent sx={{ textAlign: 'center', py: 6 }}>
@@ -535,7 +600,7 @@ export default function ReservationsPage() {
             ) : (
               <>
               {/* Reservas de Juegos */}
-              { allReservations.map(reservation => (
+              { filteredAdminGameReservations.map(reservation => (
                 <Grid item xs={12} md={6} key={`admin-game-${reservation.id}`}>
                   <Card
                   sx={{
@@ -621,7 +686,7 @@ export default function ReservationsPage() {
                 </Grid>
               ))}
               {/* Reservas de Mesas */}
-              {allTableReservations.map((reservation: TableReservationDto) => (
+              {filteredAdminTableReservations.map((reservation: TableReservationDto) => (
                 <Grid item xs={12} md={6} key={`admin-table-${reservation.id}`}>
                   <Card
                   sx={{border: '2px solid rgba(255, 0, 255, 0.3)',
