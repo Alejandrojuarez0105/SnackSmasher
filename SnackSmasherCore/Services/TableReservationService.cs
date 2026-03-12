@@ -59,7 +59,14 @@ namespace SnackSmasherCore.Services
                     IsMatchEvent = tr.IsMatchEvent,
                     Notes = tr.Notes,
                     Status = tr.Status,
-                    CreatedAt = tr.CreatedAt
+                    CreatedAt = tr.CreatedAt,
+                    LinkedGameReservationId = tr.LinkedGameReservationId,
+                    LinkedVideogameTitle = tr.LinkedGameReservationId != null
+                        ? _context.GameReservations
+                            .Where(gr => gr.Id == tr.LinkedGameReservationId)
+                            .Select(gr => gr.Videogame.Title)
+                            .FirstOrDefault()
+                        : null
                 })
                 .OrderByDescending(tr => tr.ReservationDate)
                 .ThenBy(tr => tr.StartTime)
@@ -89,7 +96,14 @@ namespace SnackSmasherCore.Services
                     IsMatchEvent = tr.IsMatchEvent,
                     Notes = tr.Notes,
                     Status = tr.Status,
-                    CreatedAt = tr.CreatedAt
+                    CreatedAt = tr.CreatedAt,
+                    LinkedGameReservationId = tr.LinkedGameReservationId,
+                    LinkedVideogameTitle = tr.LinkedGameReservationId != null
+                        ? _context.GameReservations
+                            .Where(gr => gr.Id == tr.LinkedGameReservationId)
+                            .Select(gr => gr.Videogame.Title)
+                            .FirstOrDefault()
+                        : null
                 })
                 .OrderByDescending(tr => tr.ReservationDate)
                 .ThenBy(tr => tr.StartTime)
@@ -117,7 +131,14 @@ namespace SnackSmasherCore.Services
                     IsMatchEvent = tr.IsMatchEvent,
                     Notes = tr.Notes,
                     Status = tr.Status,
-                    CreatedAt = tr.CreatedAt
+                    CreatedAt = tr.CreatedAt,
+                    LinkedGameReservationId = tr.LinkedGameReservationId,
+                    LinkedVideogameTitle = tr.LinkedGameReservationId != null
+                        ? _context.GameReservations
+                            .Where(gr => gr.Id == tr.LinkedGameReservationId)
+                            .Select(gr => gr.Videogame.Title)
+                            .FirstOrDefault()
+                        : null
                 })
                 .OrderByDescending(tr => tr.ReservationDate)
                 .ThenBy(tr => tr.StartTime)
@@ -240,7 +261,14 @@ namespace SnackSmasherCore.Services
                     IsMatchEvent = tr.IsMatchEvent,
                     Notes = tr.Notes,
                     Status = tr.Status,
-                    CreatedAt = tr.CreatedAt
+                    CreatedAt = tr.CreatedAt,
+                    LinkedGameReservationId = tr.LinkedGameReservationId,
+                    LinkedVideogameTitle = tr.LinkedGameReservationId != null
+                        ? _context.GameReservations
+                            .Where(gr => gr.Id == tr.LinkedGameReservationId)
+                            .Select(gr => gr.Videogame.Title)
+                            .FirstOrDefault()
+                        : null
                 })
                 .OrderBy(tr => tr.StartTime)
                 .ToListAsync();

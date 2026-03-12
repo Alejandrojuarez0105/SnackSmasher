@@ -25,6 +25,21 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import { useAuth } from '../context/AuthContext'
 import { useNotification } from '../utils/useNotification'
 
+interface GameReservationDto {
+  id: number;
+  userId: number;
+  username: string;
+  videogameId: number;
+  videogameTitle: string;
+  reservationDate: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  notes?: string;
+  createdAt: string;
+  linkedTableReservationId?: number;
+  linkedTableNumber?: number;
+}
 interface TableReservationDto {
   id: number;
   userId: number;
@@ -38,6 +53,8 @@ interface TableReservationDto {
   notes?: string;
   status: string;
   createdAt: string;
+  linkedGameReservationId?: number;
+  linkedVideogameTitle?: string;
 }
 
 export default function ReservationsPage() {
@@ -320,7 +337,25 @@ export default function ReservationsPage() {
                       📝 {reservation.notes}
                     </Typography>
                   )}
-                </Box>
+                  {reservation.linkedTableReservationId && (
+                    <Box
+                      sx={{
+                        mt: 2,
+                        p: 1.5,
+                        borderRadius: 1,
+                        background: 'rgba(255, 0, 255, 0.1)',
+                        border: '1px solid rgba(255, 0, 255, 0.3)'
+                      }}
+                    >
+                      <Typography
+                        variant='caption'
+                        sx={{ fontWeight: 600, color: 'secondary.main' }}
+                        >
+                          🔗 Combinado con Mesa #{reservation.linkedTableNumber}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
 
                 <Button
                   fullWidth
@@ -402,6 +437,24 @@ export default function ReservationsPage() {
                     >
                       📝 {reservation.notes}
                     </Typography>
+                  )}
+                  {reservation.linkedGameReservationId && (
+                    <Box
+                      sx={{
+                        mt: 2,
+                        p: 1.5,
+                        borderRadius: 1,
+                        background: 'rgba(0, 255, 255, 0.1)',
+                        border: '1px solid rgba(0, 255, 255, 0.3)'
+                      }}
+                    >
+                      <Typography
+                        variant='caption'
+                        sx={{ fontWeight: 600, color: 'primary.main' }}
+                      >
+                        🔗 Combinado con {reservation.linkedVideogameTitle}
+                      </Typography>
+                    </Box>
                   )}
                 </Box>
 

@@ -16,6 +16,8 @@
         public string? Notes { get; set; }
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public int? LinkedGameReservationId { get; set; }
+        public string? LinkedVideogameTitle { get; set; }
     }
 
     public class CreateTableReservationDto
@@ -27,6 +29,7 @@
         public int GuestCount { get; set; } = 1;
         public bool IsMatchEvent { get; set; } = false;
         public string? Notes { get; set; }
+        public int? LinkedGameReservationId { get; set; }
     }
 
     public class UpdateTableReservationDto

@@ -139,34 +139,57 @@ export default function TableReservationsPage() {
     }
 
     try {
-      // Crear reserva de mesa
-      const tableReservationData = {
-        tableId: selectedTable.id,
-        reservationDate: formData.reservationDate,
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        numberOfGuests: formData.numberOfGuests,
-        notes: formData.notes,
-      };
-
-      await axiosInstance.post('/TableReservations', tableReservationData);
-      
-      // Si incluye juego, crear también reserva de juego
       if (includeGame && formData.videogameId > 0) {
+        // Reserva combinada (mesa + juego)
+
+        // 1. Crear reserva de mesa
+        const tableReservationData = {
+          tableId: selectedTable.id,
+          reservationDate: formData.reservationDate,
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          guestCount: formData.numberOfGuests,
+          notes: formData.notes,
+        };
+
+        const tableResponse = await axiosInstance.post('/TableReservations', tableReservationData);
+        const tableReservationId = tableResponse.data.id;
+
+        // 2. Crear reserva de juego vinculada a la reserva de mesa
         const gameReservationData = {
           videogameId: formData.videogameId,
           reservationDate: formData.reservationDate,
           startTime: formData.startTime,
           endTime: formData.endTime,
           notes: `Reserva combinada con Mesa #${selectedTable.number}`,
+          linkedTableReservationId: tableReservationId, // Vincular ambas reservas
         };
-        
-        await axiosInstance.post('/GameReservations', gameReservationData);
-        showSuccess('Reserva de mesa y juego creada exitosamente');
-      } else {
-        showSuccess('Reserva de mesa creada exitosamente');
-      }
+
+        const gameResponse = await axiosInstance.post('/GameReservations', gameReservationData);
+        const gameReservationId = gameResponse.data.id;
+
+        // 3. Actualizar reserva de mesa con el ID del juego
+        await axiosInstance.put(`/TableReservations/${tableReservationId}`, {
+          linkedGameReservationId: gameReservationId,
+        });
+
+        showSuccess('Reserva combinada de mesa y juego creada exitosamente');
       
+      } else {
+        // Reserva solo de mesa
+        const tableReservationData = {
+        tableId: selectedTable.id,
+        reservationDate: formData.reservationDate,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        guestCount: formData.numberOfGuests,
+        notes: formData.notes,
+      };
+
+      await axiosInstance.post('/TableReservations', tableReservationData);
+      showSuccess('Reserva de mesa creada exitosamente');
+      }
+
       setDialogOpen(false);
       setIncludeGame(false);
     } catch (err: any) {

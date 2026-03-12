@@ -57,7 +57,14 @@ namespace SnackSmasherCore.Services
                     EndTime = gr.EndTime,
                     Status = gr.Status,
                     Notes = gr.Notes,
-                    CreatedAt = gr.CreatedAt
+                    CreatedAt = gr.CreatedAt,
+                    LinkedTableReservationId = gr.LinkedTableReservationId,
+                    LinkedTableNumber = gr.LinkedTableReservationId != null
+                        ? _context.TableReservations
+                            .Where(tr => tr.Id == gr.LinkedTableReservationId)
+                            .Select(tr => (int?)tr.Table.Number)
+                            .FirstOrDefault() 
+                        : null
                 })
                 .OrderByDescending(gr => gr.ReservationDate)
                 .ThenBy(gr => gr.StartTime)
@@ -85,7 +92,14 @@ namespace SnackSmasherCore.Services
                     EndTime = gr.EndTime,
                     Status = gr.Status,
                     Notes = gr.Notes,
-                    CreatedAt = gr.CreatedAt
+                    CreatedAt = gr.CreatedAt,
+                    LinkedTableReservationId = gr.LinkedTableReservationId,
+                    LinkedTableNumber = gr.LinkedTableReservationId != null
+                        ? _context.TableReservations
+                            .Where(tr => tr.Id == gr.LinkedTableReservationId)
+                            .Select(tr => (int?)tr.Table.Number)
+                            .FirstOrDefault()
+                        : null
                 })
                 .OrderByDescending(gr => gr.ReservationDate)
                 .ThenBy(gr => gr.StartTime)
@@ -110,7 +124,14 @@ namespace SnackSmasherCore.Services
                     EndTime = gr.EndTime,
                     Status = gr.Status,
                     Notes = gr.Notes,
-                    CreatedAt = gr.CreatedAt
+                    CreatedAt = gr.CreatedAt,
+                    LinkedTableReservationId = gr.LinkedTableReservationId,
+                    LinkedTableNumber = gr.LinkedTableReservationId != null
+                        ? _context.TableReservations
+                            .Where(tr => tr.Id == gr.LinkedTableReservationId)
+                            .Select(tr => (int?)tr.Table.Number)
+                            .FirstOrDefault()
+                        : null
                 })
                 .OrderByDescending(gr => gr.ReservationDate)
                 .ThenBy(gr => gr.StartTime)
@@ -221,7 +242,14 @@ namespace SnackSmasherCore.Services
                     EndTime = gr.EndTime,
                     Status = gr.Status,
                     Notes = gr.Notes,
-                    CreatedAt = gr.CreatedAt
+                    CreatedAt = gr.CreatedAt,
+                    LinkedTableReservationId = gr.LinkedTableReservationId,
+                    LinkedTableNumber = gr.LinkedTableReservationId != null
+                        ? _context.TableReservations
+                            .Where(tr => tr.Id == gr.LinkedTableReservationId)
+                            .Select(tr => (int?)tr.Table.Number)
+                            .FirstOrDefault()
+                        : null
                 })
                 .OrderBy(gr => gr.ReservationDate)
                 .ThenBy(gr => gr.StartTime)

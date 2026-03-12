@@ -13,6 +13,7 @@
         public string? Notes { get; set; }
         public string Status { get; set; } = "Confirmed"; // Confirmed, Cancelled, Completed
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public int? LinkedGameReservationId { get; set; }
 
         // Navegación
         public User User { get; set; } = null!;

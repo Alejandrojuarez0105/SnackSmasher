@@ -13,6 +13,8 @@
         public string Status { get; set; } = string.Empty;
         public string? Notes { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int? LinkedTableReservationId { get; set; }
+        public int? LinkedTableNumber { get; set; }
     }
 
     public class CreateGameReservationDto
@@ -22,6 +24,7 @@
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public string? Notes { get; set; }
+        public int? LinkedTableReservationId { get; set; }
     }
 
     public class UpdateGameReservationDto

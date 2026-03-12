@@ -11,6 +11,7 @@
         public string Status { get; set; } = "Active"; // Active, Completed, Cancelled
         public string? Notes { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public int? LinkedTableReservationId { get; set; }
 
         // Navegación
         public User User { get; set; } = null!;

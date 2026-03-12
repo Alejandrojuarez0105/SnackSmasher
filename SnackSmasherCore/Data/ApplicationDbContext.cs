@@ -81,6 +81,7 @@ namespace SnackSmasherCore.Data
                 entity.Property(e => e.Status).IsRequired().HasMaxLength(20).HasDefaultValue("Active");
                 entity.Property(e => e.Notes).HasMaxLength(300);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+                entity.Property(e => e.LinkedTableReservationId).IsRequired(false);
 
                 entity.HasOne(e => e.User)
                     .WithMany(u => u.GameReservations)
@@ -125,6 +126,7 @@ namespace SnackSmasherCore.Data
                 entity.Property(e => e.Notes).HasMaxLength(300);
                 entity.Property(e => e.Status).IsRequired().HasMaxLength(20).HasDefaultValue("Confirmed");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+                entity.Property(e => e.LinkedGameReservationId).IsRequired(false);
 
                 entity.HasOne(e => e.User)
                     .WithMany(u => u.TableReservations)
