@@ -192,6 +192,7 @@ namespace SnackSmasherCore.Services
                 EndTime = createDto.EndTime,
                 Status = "Active",
                 Notes = createDto.Notes,
+                LinkedTableReservationId = createDto.LinkedTableReservationId,
                 CreatedAt = DateTime.Now
             };
 

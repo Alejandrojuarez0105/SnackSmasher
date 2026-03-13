@@ -28,6 +28,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../utils/useNotification';
 import { videogamesAPI, VideogameDto } from '../api/videogames';
 import TimeSelector from '../components/TimeSelector';
+import { set } from 'react-hook-form';
 
 interface Table {
   id: number;
@@ -174,6 +175,9 @@ export default function TableReservationsPage() {
         });
 
         showSuccess('Reserva combinada de mesa y juego creada exitosamente');
+        setDialogOpen(false);
+        setIncludeGame(false);
+        loadData();
       
       } else {
         // Reserva solo de mesa

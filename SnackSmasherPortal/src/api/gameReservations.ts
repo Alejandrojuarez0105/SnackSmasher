@@ -12,6 +12,8 @@ export interface GameReservationDto {
   status: string;
   notes?: string;
   createdAt: string;
+  linkedTableReservationId?: number;
+  linkedTableNumber?: number;
 }
 
 export interface CreateGameReservationDto {
@@ -20,6 +22,7 @@ export interface CreateGameReservationDto {
   startTime: string;
   endTime: string;
   notes?: string;
+  linkedTableReservationId?: number;
 }
 
 export const gameReservationsAPI = {
