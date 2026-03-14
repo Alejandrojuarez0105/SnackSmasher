@@ -88,7 +88,15 @@ export default function ReservationsPage() {
 
   const handleCancelReservation = async (id: number) => {
     try {
+      const reservation = gameReservations.find(r => r.id === id) || allReservations.find(r => r.id === id)
       await gameReservationsAPI.cancel(id)
+
+      if (reservation?.linkedTableReservationId) {
+        await axiosInstance.put(`/TableReservations/${reservation.linkedTableReservationId}`, { 
+          Status: 'Cancelled' 
+        })
+      }
+
       showSuccess('Reserva cancelada exitosamente')
       loadReservations()
     } catch (err: any) {
@@ -98,7 +106,16 @@ export default function ReservationsPage() {
 
   const handleConfirmReservation = async (id: number) => {
     try {
+      const reservation = allReservations.find(r => r.id === id)
+
       await axiosInstance.put(`/GameReservations/${id}/confirm`);
+
+      if (reservation?.linkedTableReservationId) {
+        await axiosInstance.put(`/TableReservations/${reservation.linkedTableReservationId}`, { 
+          Status: 'Confirmed' 
+        })
+      }
+
       showSuccess('Reserva confirmada exitosamente');
       loadReservations();
     } catch (err) {
@@ -268,18 +285,18 @@ export default function ReservationsPage() {
           >
             <Tab
               icon={<SportsEsports />}
-              label={`Mis Reservas Activas (${activeReservations.length + activeTableReservations.length})`}
+              label={`Mis Reservas Activas (${activeGameOnly.length + activeTableOnly.length + activeCombined.length})`}
               iconPosition='start'
             />
             <Tab
               icon={<EventSeat />}
-              label={`Mi Historial (${pastReservations.length + pastTableReservations.length})`}
+              label={`Mi Historial (${pastGameOnly.length + pastTableOnly.length + pastCombined.length})`}
               iconPosition='start'
             />
             {isAdmin && (
               <Tab
                 icon={<AdminPanelSettings />}
-                label={`Todas las Reservas (${allReservations.length + allTableReservations.length})`}
+                label={`Todas las Reservas (${filteredAdminGameOnly.length + filteredAdminTableOnly.length + filteredAdminCombined.length})`}
                 iconPosition='start'
               />
             )}
@@ -707,7 +724,7 @@ export default function ReservationsPage() {
               size='small'
               onClick={() => setAdminFilter('all')}
             >
-              Todas ({allReservations.length + allTableReservations.length})
+              Todas ({filteredAdminGameOnly.length + filteredAdminTableOnly.length + filteredAdminCombined.length})
             </Button>
             <Button
               variant={adminFilter === 'active' ? 'contained' : 'outlined'}
@@ -715,15 +732,24 @@ export default function ReservationsPage() {
               color='warning'
               onClick={() => setAdminFilter('active')}
             >
-              Activas ({allReservations.filter(r => r.status === 'Active').length + allTableReservations.filter((r: any) => r.status === 'Active').length})
+              Activas ({
+              allReservations.filter(r => r.status === 'Active' && !r.linkedTableReservationId).length + 
+              allTableReservations.filter((r: any) => r.status === 'Active' && !r.linkedGameReservationId && !allReservations.some(gr => gr.linkedTableReservationId === r.id)).length +
+              allReservations.filter(r => r.status === 'Active' && r.linkedTableReservationId).length
+              })
             </Button>
+
             <Button
               variant={adminFilter === 'confirmed' ? 'contained' : 'outlined'}
               size='small'
               color='success'
               onClick={() => setAdminFilter('confirmed')}
             >
-              Confirmadas ({allReservations.filter(r => r.status === 'Confirmed').length + allTableReservations.filter((r: any) => r.status === 'Confirmed').length})
+              Confirmadas ({
+              allReservations.filter(r => r.status === 'Confirmed' && !r.linkedTableReservationId).length + 
+              allTableReservations.filter((r: any) => r.status === 'Confirmed' && !r.linkedGameReservationId && !allReservations.some(gr => gr.linkedTableReservationId === r.id)).length +
+              allReservations.filter(r => r.status === 'Confirmed' && r.linkedTableReservationId).length
+              })
             </Button>
             <Button
               variant={adminFilter === 'completed' ? 'contained' : 'outlined'}
@@ -731,7 +757,11 @@ export default function ReservationsPage() {
               color='info'
               onClick={() => setAdminFilter('completed')}
             >
-              Completadas ({allReservations.filter(r => r.status === 'Completed').length + allTableReservations.filter((r: any) => r.status === 'Completed').length})
+              Completadas ({
+              allReservations.filter(r => r.status === 'Completed' && !r.linkedTableReservationId).length +
+              allTableReservations.filter((r: any) => r.status === 'Completed' && !r.linkedGameReservationId && !allReservations.some(gr => gr.linkedTableReservationId === r.id)).length +
+              allReservations.filter(r => r.status === 'Completed' && r.linkedTableReservationId).length
+              })
             </Button>
             <Button
               variant={adminFilter === 'cancelled' ? 'contained' : 'outlined'}
@@ -739,7 +769,11 @@ export default function ReservationsPage() {
               color='error'
               onClick={() => setAdminFilter('cancelled')}
             >
-              Canceladas ({allReservations.filter(r => r.status === 'Cancelled').length + allTableReservations.filter((r: any) => r.status === 'Cancelled').length})
+              Canceladas ({
+              allReservations.filter(r => r.status === 'Cancelled' && !r.linkedTableReservationId).length + 
+              allTableReservations.filter((r: any) => r.status === 'Cancelled' && !r.linkedGameReservationId && !allReservations.some(gr => gr.linkedTableReservationId === r.id)).length +
+              allReservations.filter(r => r.status === 'Cancelled' && r.linkedTableReservationId).length
+              })
             </Button>
           </Box>
         )}
