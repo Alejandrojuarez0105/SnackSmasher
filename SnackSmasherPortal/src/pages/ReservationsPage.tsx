@@ -146,9 +146,9 @@ export default function ReservationsPage() {
   // FILTRADO DE RESERVAS (Activas, Pasadas, Combinadas)
   // 1. Filtrar por estado
   const activeGameReservations = gameReservations.filter(r => r.status === 'Active')
-  const pastGameReservations = gameReservations.filter(r => r.status === 'Completed' || r.status === 'Cancelled')
+  const pastGameReservations = gameReservations.filter(r => r.status === 'Completed' || r.status === 'Cancelled' || r.status === 'Confirmed')
   const activeTableReservationsAll = tableReservations.filter(r => r.status === 'Active')
-  const pastTableReservationsAll = tableReservations.filter(r => r.status === 'Completed' || r.status === 'Cancelled')
+  const pastTableReservationsAll = tableReservations.filter(r => r.status === 'Completed' || r.status === 'Cancelled' || r.status === 'Confirmed')
   
   // 2. Para cálculo de totales (para los Tabs)
   const activeReservations = activeGameReservations
@@ -609,7 +609,7 @@ export default function ReservationsPage() {
         {/* Historial */}
         {tabValue === 1 && (
           <Grid container spacing={3}>
-            {pastReservations.length === 0 && pastTableReservations.length === 0 ? (
+            {pastGameOnly.length === 0 && pastTableOnly.length === 0 && pastCombined.length === 0 ? (
               <Grid item xs={12}>
                 <Card
                   sx={{
@@ -628,7 +628,7 @@ export default function ReservationsPage() {
             ) : (
               <>
               {/* Historial de Juegos */}
-              {pastReservations.map(reservation => (
+              {pastGameOnly.map(reservation => (
                 <Grid item xs={12} md={6} key={`game-past-${reservation.id}`}>
                   <Card
                     sx={{
@@ -669,7 +669,7 @@ export default function ReservationsPage() {
                 </Grid>
               ))}
               {/* Historial de Mesas */}
-              {pastTableReservations.map((reservation: TableReservationDto) => (
+              {pastTableOnly.map((reservation: TableReservationDto) => (
                 <Grid item xs={12} md={6} key={`table-past-${reservation.id}`}>
                   <Card
                     sx={{
@@ -712,6 +712,85 @@ export default function ReservationsPage() {
                   </Card>
                 </Grid>
               ))}
+
+              {/* Historial de combinadas */}
+              {pastCombined.map(reservation => {
+                const linkedTable = pastTableReservationsAll.find(t => t.id === reservation.linkedTableReservationId)
+
+                return (
+                  <Grid item xs={12} md={6} key={`combined-past-${reservation.id}`}>
+                    <Card
+                      sx={{
+                        border: '1px solid rgba(128, 128, 255, 0.2)',
+                        opacity: 0.8
+                      }}
+                    >
+                      <CardContent>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'start',
+                            mb: 2
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <SportsEsports sx={{ color: 'text.secondary' }} />
+                            <EventSeat sx={{ color: 'text.secondary' }} />
+                            <Typography variant='h6' sx={{ fontWeight: 600 }}>
+                              Reserva combinada
+                            </Typography>
+                          </Box>
+                          <Chip
+                            label={getStatusLabel(reservation.status)}
+                            color={getStatusColor(reservation.status) as any}
+                            size='small'
+                          />
+                        </Box>
+
+                        {/* Informacion del juego */}
+                        <Box
+                          sx={{
+                            p: 1,
+                            mb: 1,
+                            borderRadius: 1,
+                            background: 'rgba(0, 255, 255, 0.05)',
+                            border: '1px solid rgba(0, 255, 255, 0.2)'
+                          }}
+                        >
+                          <Typography variant='caption' sx={{ color: 'primary.main' }}>
+                            🎮 {reservation.videogameTitle}
+                          </Typography>
+                        </Box>
+
+                        {/* Informacion de la mesa */}
+                        {linkedTable && (
+                          <Box
+                            sx={{
+                              p: 1,
+                              mb: 1,
+                              borderRadius: 1,
+                              background: 'rgba(255, 0, 255, 0.05)',
+                              border: '1px solid rgba(255, 0, 255, 0.2)'
+                            }}
+                          >
+                            <Typography variant='caption' sx={{ color: 'secondary.main' }}>
+                              🪑 Mesa #{linkedTable.tableNumber} • {linkedTable.guestCount} personas
+                            </Typography>
+                          </Box>
+                        )}
+
+                        <Typography variant='body2' color='text.secondary' sx={{ mb: 0.5 }}>
+                          📅 {reservation.reservationDate}
+                        </Typography>
+                        <Typography variant='body2' color='text.secondary'>
+                          ⏰ {reservation.startTime} - {reservation.endTime}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                )
+              })}
             </>
             )}
           </Grid>

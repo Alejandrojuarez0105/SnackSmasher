@@ -1,32 +1,30 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { People, Schedule, SportsEsports, Star } from '@mui/icons-material'
 import {
+  Alert,
   Box,
-  Grid,
+  Button,
   Card,
   CardContent,
-  CardMedia,
-  Typography,
   Chip,
-  Button,
-  TextField,
-  MenuItem,
-  CircularProgress,
-  Alert,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  Rating
+  DialogContent,
+  DialogTitle,
+  Grid,
+  MenuItem,
+  Rating,
+  TextField,
+  Typography
 } from '@mui/material'
-import { SportsEsports, People, Schedule, Star } from '@mui/icons-material'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { CreateGameReservationDto, gameReservationsAPI } from '../api/gameReservations'
+import { CreateReviewDto, reviewsAPI } from '../api/reviews'
+import { VideogameDto, videogamesAPI } from '../api/videogames'
 import Layout from '../components/Dashboard/Layout'
-import { videogamesAPI, VideogameDto } from '../api/videogames'
-import { gameReservationsAPI, CreateGameReservationDto } from '../api/gameReservations'
-import { reviewsAPI, CreateReviewDto } from '../api/reviews'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { useNotification } from '../utils/useNotification'
 import TimeSelector from '../components/TimeSelector'
+import { useNotification } from '../utils/useNotification'
 
 export default function VideogamesPage() {
   const navigate = useNavigate()
@@ -39,8 +37,8 @@ export default function VideogamesPage() {
   const [reservationDialogOpen, setReservationDialogOpen] = useState(false)
   const [filters, setFilters] = useState({
     search: '',
-    genre: '',
-    platform: ''
+    genre: 'all',
+    platform: 'all'
   })
   const [reservationForm, setReservationForm] = useState({
     reservationDate: '',
@@ -89,11 +87,11 @@ export default function VideogamesPage() {
       )
     }
 
-    if (filters.genre) {
+    if (filters.genre !== 'all') {
       filtered = filtered.filter(game => game.genre === filters.genre)
     }
 
-    if (filters.platform) {
+    if (filters.platform !== 'all') {
       filtered = filtered.filter(game => game.platform === filters.platform)
     }
 
@@ -171,8 +169,8 @@ export default function VideogamesPage() {
     }
   }
 
-  const genres = [...new Set(videogames.map(g => g.genre))]
-  const platforms = [...new Set(videogames.map(g => g.platform))]
+  const genres = Array.from(new Set(videogames.map(g => g.genre))).sort()
+  const platforms = Array.from(new Set(videogames.map(g => g.platform))).sort()
 
   if (loading) {
     return (
@@ -223,7 +221,7 @@ export default function VideogamesPage() {
               value={filters.genre}
               onChange={e => setFilters({ ...filters, genre: e.target.value })}
             >
-              <MenuItem value=''>
+              <MenuItem value='all'>
                 <em>Todos los géneros</em>
               </MenuItem>
               {genres.map(genre => (
@@ -241,7 +239,7 @@ export default function VideogamesPage() {
               value={filters.platform}
               onChange={e => setFilters({ ...filters, platform: e.target.value })}
             >
-              <MenuItem value=''>
+              <MenuItem value='all'>
                 <em>Todas las plataformas</em>
               </MenuItem>
               {platforms.map(platform => (
@@ -271,11 +269,11 @@ export default function VideogamesPage() {
           <Typography variant='body1' color='text.secondary'>
             Mostrando {filteredGames.length} de {videogames.length} juegos
           </Typography>
-          {(filters.search || filters.genre || filters.platform) && (
+          {(filters.search || filters.genre !== 'all' || filters.platform !== 'all') && (
             <Button
               variant='outlined'
               size='small'
-              onClick={() => setFilters({ search: '', genre: '', platform: '' })}
+              onClick={() => setFilters({ search: '', genre: 'all', platform: 'all' })}
             >
               Limpiar filtros
             </Button>

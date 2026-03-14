@@ -1,30 +1,29 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
+  Login,
+  People,
+  Schedule,
+  SportsEsports,
+} from '@mui/icons-material';
+import {
+  Alert,
   Box,
-  Container,
-  Grid,
+  Button,
   Card,
   CardContent,
   CardMedia,
-  Typography,
   Chip,
-  TextField,
+  Container,
+  Grid,
   MenuItem,
-  CircularProgress,
-  Alert,
-  Button,
   Rating,
+  TextField,
+  Typography
 } from '@mui/material';
-import {
-  SportsEsports,
-  People,
-  Schedule,
-  Login,
-} from '@mui/icons-material';
-import PublicLayout from '../components/Public/PublicLayout';
-import { videogamesAPI, VideogameDto } from '../api/videogames';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { VideogameDto, videogamesAPI } from '../api/videogames';
 import LoadingSpinner from '../components/LoadingSpinner';
+import PublicLayout from '../components/Public/PublicLayout';
 
 export default function PublicGamesPage() {
   const navigate = useNavigate();
@@ -34,8 +33,8 @@ export default function PublicGamesPage() {
   const [filteredGames, setFilteredGames] = useState<VideogameDto[]>([]);
   const [filters, setFilters] = useState({
     search: '',
-    genre: '',
-    platform: '',
+    genre: 'all',
+    platform: 'all',
   });
 
   useEffect(() => {
@@ -69,19 +68,19 @@ export default function PublicGamesPage() {
       );
     }
 
-    if (filters.genre) {
+    if (filters.genre !== 'all') {
       filtered = filtered.filter(game => game.genre === filters.genre);
     }
 
-    if (filters.platform) {
+    if (filters.platform !== 'all') {
       filtered = filtered.filter(game => game.platform === filters.platform);
     }
 
     setFilteredGames(filtered);
   };
 
-  const genres = [...new Set(videogames.map(g => g.genre))];
-  const platforms = [...new Set(videogames.map(g => g.platform))];
+  const genres = Array.from(new Set(videogames.map(g => g.genre))).sort()
+  const platforms = Array.from(new Set(videogames.map(g => g.platform))).sort()
 
   if (loading) {
     return (
@@ -141,7 +140,7 @@ export default function PublicGamesPage() {
                 value={filters.genre}
                 onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
               >
-                <MenuItem value="">
+                <MenuItem value="all">
                 <em>Todos los géneros</em>
                 </MenuItem>
                 {genres.map(genre => (
@@ -157,7 +156,7 @@ export default function PublicGamesPage() {
                 value={filters.platform}
                 onChange={(e) => setFilters({ ...filters, platform: e.target.value })}
               >
-                <MenuItem value="">
+                <MenuItem value="all">
                 <em>Todas las plataformas</em>
                 </MenuItem>
                 {platforms.map(platform => (
@@ -171,11 +170,11 @@ export default function PublicGamesPage() {
           <Typography variant="body1" color="text.secondary">
             Mostrando {filteredGames.length} de {videogames.length} juegos
           </Typography>
-          {(filters.search || filters.genre || filters.platform) && (
+          {(filters.search || filters.genre !== 'all' || filters.platform !== 'all') && (
             <Button
               variant="outlined"
               size="small"
-              onClick={() => setFilters({ search: '', genre: '', platform: '' })}
+              onClick={() => setFilters({ search: '', genre: 'all', platform: 'all' })}
             >
               Limpiar filtros
             </Button>

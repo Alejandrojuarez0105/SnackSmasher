@@ -1,26 +1,24 @@
-import { useEffect, useState } from 'react'
+import { Add, Delete, Edit, Event as EventIcon } from '@mui/icons-material'
 import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-  IconButton,
   Alert,
-  CircularProgress,
-  Chip
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  TextField,
+  Typography
 } from '@mui/material'
-import { Add, Edit, Delete, Event as EventIcon } from '@mui/icons-material'
-import Layout from '../../components/Dashboard/Layout'
+import { useEffect, useState } from 'react'
 import axiosInstance from '../../api/axiosConfig'
+import Layout from '../../components/Dashboard/Layout'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { useNotification } from '../../utils/useNotification'
 
@@ -161,7 +159,7 @@ export default function AdminEventsPage() {
 
   return (
     <Layout>
-      <Container maxWidth='lg'>
+      <Box>
         <Box
           sx={{
             mb: 4,
@@ -351,7 +349,7 @@ export default function AdminEventsPage() {
             </Button>
           </DialogActions>
         </Dialog>
-      </Container>
+      </Box>
     </Layout>
   )
 }

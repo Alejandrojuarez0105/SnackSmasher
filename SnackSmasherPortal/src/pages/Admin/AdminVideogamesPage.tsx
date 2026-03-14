@@ -1,26 +1,25 @@
-import { useEffect, useState } from 'react'
+import { Add, Delete, Edit, SportsEsports } from '@mui/icons-material'
 import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-  IconButton,
   Alert,
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
   Chip,
-  CircularProgress
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  MenuItem,
+  TextField,
+  Typography
 } from '@mui/material'
-import { Add, Edit, Delete, SportsEsports } from '@mui/icons-material'
-import Layout from '../../components/Dashboard/Layout'
+import { useEffect, useState } from 'react'
 import axiosInstance from '../../api/axiosConfig'
+import Layout from '../../components/Dashboard/Layout'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { useNotification } from '../../utils/useNotification'
 
@@ -46,6 +45,9 @@ export default function AdminVideogamesPage() {
   const [selectedGame, setSelectedGame] = useState<Videogame | null>(null)
   const [error, setError] = useState('')
   const { showSuccess, showError } = useNotification()
+  const [selectedGenre, setSelectedGenre] = useState<string>('all')
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('all')
+  const [searchTerm, setSearchTerm] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -118,7 +120,7 @@ export default function AdminVideogamesPage() {
           new URL(formData.imageUrl); // Verifica que sea una URL válida
           } catch {
             showError('La URL de la imagen no es válida');
-            return;
+            return
           }
         }
         
@@ -160,6 +162,19 @@ export default function AdminVideogamesPage() {
       }
     };
 
+    const filteredVideogames = videogames.filter(game => {
+      const matchesGenre = selectedGenre == 'all' || game.genre === selectedGenre
+      const matchesPlatform = selectedPlatform == 'all' || game.platform === selectedPlatform
+      const matchesSearch = 
+      game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (game.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+
+      return matchesGenre && matchesPlatform && matchesSearch
+    })
+
+    const genres = Array.from(new Set(videogames.map(g => g.genre))).sort()
+    const platforms = Array.from(new Set(videogames.map(g => g.platform))).sort()
+
     if (loading) {
     return (
       <Layout>
@@ -170,7 +185,7 @@ export default function AdminVideogamesPage() {
 
   return (
     <Layout>
-      <Container maxWidth='lg'>
+      <Box>
         <Box
           sx={{
             mb: 4,
@@ -207,76 +222,184 @@ export default function AdminVideogamesPage() {
           </Alert>
         )}
 
-        <Grid container spacing={3}>
-          {videogames.map(game => (
-            <Grid item xs={12} sm={6} md={4} key={game.id}>
-              <Card
-                sx={{
-                  border: '2px solid rgba(0, 255, 255, 0.3)',
-                  boxShadow: '0 0 20px rgba(0, 255, 255, 0.2)',
-                  opacity: game.isAvailable ? 1 : 0.6,
-                }}
-              >
-                <Box
-                  sx={{
-                    height: 150,
-                    background: game.imageUrl
-                      ? `url(${game.imageUrl}) center/cover`
-                      : 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 204, 204, 0.2) 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+        {/* Barra de búsqueda y filtros */}
+        <Grid container spacing={2} sx={{ mb: 4 }}>
+            <Grid item xs={12} md={6}>
+              <TextField
+              fullWidth
+              label='Buscar juego'
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              placeholder='Buscar por título...'
+              InputProps={{
+                  startAdornment: (
+                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
+                      <SportsEsports sx={{ color: 'primary.main' }} />
+                  </Box>
+              )
+            }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+              <TextField
+              fullWidth
+              select
+              label='Género'
+              value={selectedGenre}
+              onChange={e => setSelectedGenre(e.target.value)}
+            >
+                <MenuItem value='all'>
+                <em>Todos los géneros</em>
+              </MenuItem>
+              {genres.map(genre => (
+                  <MenuItem key={genre} value={genre}>
+                  {genre}
+                </MenuItem>
+            ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+              <TextField
+              fullWidth
+              select
+              label='Plataforma'
+              value={selectedPlatform}
+              onChange={e => setSelectedPlatform(e.target.value)}
+            >
+                <MenuItem value='all'>
+                <em>Todas las plataformas</em>
+              </MenuItem>
+              {platforms.map(platform => (
+                  <MenuItem key={platform} value={platform}>
+                  {platform}
+                </MenuItem>
+            ))}
+            </TextField>
+          </Grid>
+        </Grid>
+
+            {/* Resultados y botón de limpiar filtros */}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: 3
+              }}
+            >
+              <Typography variant='body1' color='text.secondary'>
+                Mostrando {filteredVideogames.length} de {videogames.length} juegos
+              </Typography>
+              {(searchTerm || selectedGenre !== 'all' || selectedPlatform !== 'all') && (
+                <Button
+                  variant='outlined'
+                  size='small'
+                  onClick={() => {
+                    setSearchTerm('')
+                    setSelectedGenre('all')
+                    setSelectedPlatform('all')
                   }}
                 >
-                  {!game.imageUrl && (
-                    <SportsEsports sx={{ fontSize: 60, color: 'primary.main' }} />
-                  )}
+                Limpiar Filtros
+              </Button>
+              )}
+            </Box>
+
+        <Grid container spacing={3}>
+          {filteredVideogames.length === 0 && (
+            <Grid item xs={12}>
+              <Card sx={{ border: '2px solid rgba(0, 255, 255, 0.3)' }}>
+                <CardContent sx={{ textAlign: 'center', py: 6 }}>
+                  <SportsEsports sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+                  <Typography variant='h6' color='text.secondary'>
+                    No se encontraron videojuegos
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    Intenta ajustar tus filtros o agrega nuevos videojuegos
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
+
+          {filteredVideogames.map(game => (
+            <Grid item xs={12} sm={6} md={4} key={game.id}>
+              <Card
+              sx={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                border: '2px solid rgba(0, 255, 255, 0.3)',
+                boxShadow: '0 0 20px rgba(0, 255, 255, 0.2)',
+                opacity: game.isAvailable ? 1 : 0.6,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 8px 30px rgba(0, 255, 255, 0.4)'
+                }
+              }}
+            >
+              <Box
+              sx={{
+                  height: 200,
+                  background: game.imageUrl
+                    ? `url(${game.imageUrl}) center/cover`
+                    : 'linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 204, 204, 0.2) 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              >
+                {!game.imageUrl && (
+                  <SportsEsports sx={{ fontSize: 80, color: 'primary.main' }} />
+                )}
                 </Box>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
-                    <Typography variant='h6' gutterBottom sx={{ fontWeight: 700 }}>
-                      {game.title}
-                    </Typography>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Box
+                  sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'start',
+                      mb: 2
+
+                  }}
+                >
+                  <Typography variant='h6' gutterBottom sx={{ fontWeight: 700 }}>
+                    {game.title}
+                  </Typography>
                   <Chip
                     label={game.isAvailable ? 'Activo' : 'Inactivo'}
                     size='small'
                     color={game.isAvailable ? 'success' : 'default'}
                   />
                 </Box>
-                  <Box sx={{ mb: 2 }}>
+                <Box sx={{ mb: 2 }}>
                     <Chip label={game.genre} size='small' sx={{ mr: 1 }} />
-                    <Chip label={game.platform} size='small' />
-                  </Box>
-                  <Typography variant='body2' color='text.secondary'>
+                  <Chip label={game.platform} size='small' />
+                </Box>
+                <Typography variant='body2' color='text.secondary'>
                     Copias: {game.totalCopies} | Disponibles: {game.availableCopies}
                   </Typography>
-                  <Typography variant='body2' color='text.secondary'>
+                <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
                     Duración máxima: {game.maxSessionMinutes} min
-                  </Typography>
+                </Typography>
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                  <Button
-                    size='small'
-                    onClick={() => handleToggleActive(game)}
-                  >
-                    {game.isAvailable ? 'Desactivar' : 'Activar'}
-                  </Button>
+                    <Button size='small' onClick={() => handleToggleActive(game)}>
+                      {game.isAvailable ? 'Desactivar' : 'Activar'}
+                    </Button>
                   <Box>
-                    <IconButton 
-                      color='primary' 
-                      onClick={() => handleOpenDialog(game)}
-                    >
-                      <Edit />
+                      <IconButton color='primary' onClick={() => handleOpenDialog(game)}>
+                        <Edit />
                     </IconButton>
-                    <IconButton 
-                    color='error' 
-                    onClick={() => handleDelete(game.id)}
-                  >
-                    <Delete />
-                  </IconButton>
+                    <IconButton color='error' onClick={() => handleDelete(game.id)}>
+                        <Delete />
+                    </IconButton>
                   </Box>
                 </CardActions>
-              </Card>
+                </Card>
             </Grid>
           ))}
         </Grid>
@@ -399,7 +522,7 @@ export default function AdminVideogamesPage() {
             </Button>
           </DialogActions>
         </Dialog>
-      </Container>
+      </Box>
     </Layout>
   )
 }

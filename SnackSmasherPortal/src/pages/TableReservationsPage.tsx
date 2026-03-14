@@ -1,34 +1,33 @@
-import { useEffect, useState } from 'react';
 import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Grid,
-  Card,
-  CardContent,
-  CircularProgress,
-  Checkbox,
-  FormControlLabel,
-  MenuItem,
-} from '@mui/material';
-import {
-  TableRestaurant,
   Add,
   SportsEsports,
+  TableRestaurant,
 } from '@mui/icons-material';
-import Layout from '../components/Dashboard/Layout';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Checkbox,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  Grid,
+  MenuItem,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { useEffect, useState } from 'react';
 import axiosInstance from '../api/axiosConfig';
+import { VideogameDto, videogamesAPI } from '../api/videogames';
+import Layout from '../components/Dashboard/Layout';
+import TimeSelector from '../components/TimeSelector';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../utils/useNotification';
-import { videogamesAPI, VideogameDto } from '../api/videogames';
-import TimeSelector from '../components/TimeSelector';
-import { set } from 'react-hook-form';
 
 interface Table {
   id: number;
