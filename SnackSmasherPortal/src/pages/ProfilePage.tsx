@@ -1,40 +1,38 @@
-import { useState, useEffect } from 'react'
 import {
+  AdminPanelSettings,
+  CalendarToday,
+  Delete,
+  Edit,
+  Email,
+  Person
+} from '@mui/icons-material'
+import {
+  Avatar,
   Box,
+  Button,
   Card,
   CardContent,
-  Typography,
-  Avatar,
-  Grid,
   Chip,
-  Divider,
-  Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Alert,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  IconButton,
   Rating,
-  IconButton
+  TextField,
+  Typography
 } from '@mui/material'
-import {
-  Person,
-  Email,
-  AdminPanelSettings,
-  Edit,
-  CalendarToday,
-  Star,
-  Delete
-} from '@mui/icons-material'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import axiosInstance from '../api/axiosConfig'
+import { GameReservationDto, gameReservationsAPI } from '../api/gameReservations'
+import { ReviewDto, reviewsAPI } from '../api/reviews'
 import Layout from '../components/Dashboard/Layout'
 import { useAuth } from '../context/AuthContext'
-import { reviewsAPI, ReviewDto } from '../api/reviews'
-import { useNavigate } from 'react-router-dom'
 import { useNotification } from '../utils/useNotification'
-import { gameReservationsAPI, GameReservationDto } from '../api/gameReservations';
-import axiosInstance from '../api/axiosConfig'
 
 export default function ProfilePage() {
   const { user, isAdmin } = useAuth()
@@ -390,7 +388,7 @@ export default function ProfilePage() {
                       </Card>
                     ))}
                     {myReviews.length > 3 && (
-                      <Button variant='text' onClick={() => navigate('/videogames')}>
+                      <Button variant='text' onClick={() => navigate('/my-reviews')}>
                         Ver todas mis reseñas
                       </Button>
                     )}

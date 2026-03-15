@@ -20,6 +20,7 @@ import {
 import { useEffect, useState } from 'react'
 import axiosInstance from '../../api/axiosConfig'
 import Layout from '../../components/Dashboard/Layout'
+import ImageUploader from '../../components/ImageUploader'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { useNotification } from '../../utils/useNotification'
 
@@ -114,16 +115,6 @@ export default function AdminVideogamesPage() {
 
   const handleSubmit = async () => {
     try {
-      // Validar URL de imagen si existe
-      if (formData.imageUrl && formData.imageUrl.trim()) {
-        try {
-          new URL(formData.imageUrl); // Verifica que sea una URL válida
-          } catch {
-            showError('La URL de la imagen no es válida');
-            return
-          }
-        }
-        
         if (editMode && selectedGame) {
           await axiosInstance.put(`/Videogames/${selectedGame.id}`, formData)
           showSuccess('Videojuego actualizado exitosamente')
@@ -488,12 +479,10 @@ export default function AdminVideogamesPage() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label='URL de Imagen'
+                <ImageUploader
                   value={formData.imageUrl}
-                  onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-                  placeholder='https://ejemplo.com/imagen.jpg'
+                  onChange={(url) => setFormData({ ...formData, imageUrl: url})}
+                  label='Imagen del videojuego'
                 />
               </Grid>
               <Grid item xs={12}>

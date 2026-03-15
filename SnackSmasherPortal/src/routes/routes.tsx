@@ -1,23 +1,24 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import LoginPage from '../pages/LoginPage'
-import RegisterPage from '../pages/RegisterPage'
+import AdminEventsPage from '../pages/Admin/AdminEventsPage'
+import AdminMenuPage from '../pages/Admin/AdminMenuPage'
+import AdminTablesPage from '../pages/Admin/AdminTablesPage'
+import AdminVideogamesPage from '../pages/Admin/AdminVideogamesPage'
 import Dashboard from '../pages/Dashboard'
-import VideogamesPage from '../pages/VideogamesPage'
-import ProfilePage from '../pages/ProfilePage'
-import ReservationsPage from '../pages/ReservationsPage'
-import MenuPage from '../pages/MenuPage'
 import EventsPage from '../pages/EventsPage'
+import GameReviewsPage from '../pages/GameReviewsPage'
 import LandingPage from '../pages/LandingPage'
+import LoginPage from '../pages/LoginPage'
+import MenuPage from '../pages/MenuPage'
+import MyReviewsPage from '../pages/MyReviewsPage'
+import ProfilePage from '../pages/ProfilePage'
+import PublicEventsPage from '../pages/PublicEventsPage'
 import PublicGamesPage from '../pages/PublicGamesPage'
 import PublicMenuPage from '../pages/PublicMenuPage'
-import PublicEventsPage from '../pages/PublicEventsPage'
-import AdminVideogamesPage from '../pages/Admin/AdminVideogamesPage'
-import AdminEventsPage from '../pages/Admin/AdminEventsPage'
-import AdminTablesPage from '../pages/Admin/AdminTablesPage'
-import AdminMenuPage from '../pages/Admin/AdminMenuPage'
-import GameReviewsPage from '../pages/GameReviewsPage'
+import RegisterPage from '../pages/RegisterPage'
+import ReservationsPage from '../pages/ReservationsPage'
 import TableReservationsPage from '../pages/TableReservationsPage'
+import VideogamesPage from '../pages/VideogamesPage'
 
 // Componente para rutas protegidas
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
@@ -121,6 +122,15 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path='/my-reviews'
+        element={
+          <ProtectedRoute>
+            <MyReviewsPage />
           </ProtectedRoute>
         }
       />

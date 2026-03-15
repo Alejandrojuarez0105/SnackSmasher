@@ -1,29 +1,29 @@
-import { useEffect, useState } from 'react'
+import { Add, Delete, Edit, Restaurant } from '@mui/icons-material'
 import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-  IconButton,
   Alert,
-  CircularProgress,
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
   Chip,
-  Tabs,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  MenuItem,
   Tab,
-  MenuItem
+  Tabs,
+  TextField,
+  Typography
 } from '@mui/material'
-import { Add, Edit, Delete, Restaurant } from '@mui/icons-material'
-import Layout from '../../components/Dashboard/Layout'
+import { useEffect, useState } from 'react'
 import axiosInstance from '../../api/axiosConfig'
+import Layout from '../../components/Dashboard/Layout'
+import ImageUploader from '../../components/ImageUploader'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { useNotification } from '../../utils/useNotification'
 
@@ -122,17 +122,7 @@ export default function AdminMenuPage() {
   }
 
   const handleSubmit = async () => {
-    try {
-      // Validar URL de imagen si existe
-      if (formData.imageUrl && formData.imageUrl.trim()) {
-        try {
-          new URL(formData.imageUrl); // Verifica que sea una URL válida
-          } catch {
-            showError('La URL de la imagen no es válida');
-            return;
-          }
-        }
-        
+    try {        
       if (editMode && selectedItem) {
         await axiosInstance.put(`/Menu/items/${selectedItem.id}`, formData)
         showSuccess('Item actualizado exitosamente')
@@ -390,12 +380,10 @@ export default function AdminMenuPage() {
                 </TextField>
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label='URL de Imagen'
+                <ImageUploader
                   value={formData.imageUrl}
-                  onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-                  placeholder='https://ejemplo.com/imagen.jpg'
+                  onChange={(url) => setFormData({ ...formData, imageUrl: url})}
+                  label='Imagen del plato/bebida'
                 />
               </Grid>
             </Grid>

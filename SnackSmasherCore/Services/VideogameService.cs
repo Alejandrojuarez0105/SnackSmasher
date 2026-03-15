@@ -106,15 +106,28 @@ namespace SnackSmasherCore.Services
             var videogame = await _context.Videogames.FindAsync(id);
             if (videogame == null) return null;
 
+            int currentReservedCopies = videogame.TotalCopies - videogame.AvailableCopies;
+
             if (updateDto.Title != null) videogame.Title = updateDto.Title;
             if (updateDto.Description != null) videogame.Description = updateDto.Description;
             if (updateDto.Genre != null) videogame.Genre = updateDto.Genre;
             if (updateDto.Platform != null) videogame.Platform = updateDto.Platform;
             if (updateDto.IsMultiplayer.HasValue) videogame.IsMultiplayer = updateDto.IsMultiplayer.Value;
-            if (updateDto.TotalCopies.HasValue) videogame.TotalCopies = updateDto.TotalCopies.Value;
             if (updateDto.MaxSessionMinutes.HasValue) videogame.MaxSessionMinutes = updateDto.MaxSessionMinutes.Value;
             if (updateDto.ImageUrl != null) videogame.ImageUrl = updateDto.ImageUrl;
             if (updateDto.IsAvailable.HasValue) videogame.IsAvailable = updateDto.IsAvailable.Value;
+
+            if (updateDto.TotalCopies.HasValue)
+            {
+                int newTotalCopies = updateDto.TotalCopies.Value;
+                int newAvailableCopies = newTotalCopies - currentReservedCopies;
+                if (newAvailableCopies < 0)
+                {
+                    newAvailableCopies = 0;
+                }
+                videogame.TotalCopies = newTotalCopies;
+                videogame.AvailableCopies = newAvailableCopies;
+            }
 
             videogame.UpdatedAt = DateTime.Now;
 
